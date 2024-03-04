@@ -49,7 +49,7 @@ import okio.IOException
 import retrofit2.HttpException
 
 @AndroidEntryPoint
-class SearchFragment: Fragment() {
+class SearchFragment : Fragment() {
 
     private val binding get() = _binding!!
     private var _binding: FragmentSearchBinding? = null
@@ -58,8 +58,10 @@ class SearchFragment: Fragment() {
         private const val ITEMS_PER_ROW = 2
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
 
         return binding.root

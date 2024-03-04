@@ -42,6 +42,6 @@ import com.realworld.android.petsave.common.data.cache.model.cachedorganization.
 @Dao
 interface OrganizationsDao {
 
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
-  fun insert(organizations: List<CachedOrganization>)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(organizations: List<CachedOrganization>)
 }

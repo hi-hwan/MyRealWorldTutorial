@@ -34,6 +34,10 @@
 
 package com.realworld.android.petsave.common.domain.model.animal
 
+/**
+ * 도메인 모델 객체와 관련된 로직이 있는 경우 해당 로직을 객체 내에 포함시키는 것이 좋다.
+ * 높은 응집력이라는 개념에서 이것은 그 좋은 예다
+ */
 data class Media(
     val photos: List<Photo>,
     val videos: List<Video>
@@ -55,17 +59,29 @@ data class Media(
     ) {
 
         companion object {
-            private const val EMPTY_PHOTO = ""
+            private const val NO_SIZE_AVAILABLE = ""
         }
 
+        /**
+         * 사용 가능한 가장 작은 크기의 사진을 반환하며, 이는 동물 목록에 동물 이미지를 표시하는 데 유용하다.
+         * 목록에 고해상도 이미지가 필요하지 않으며 이미지가 작을수록 API에서 요청하는 바이트 수가 줄든다.
+         *
+         * @return 사용 가능한 가장 작은 크기의 사진
+         */
         fun getSmallestAvailablePhoto(): String {
             return when {
                 isValidPhoto(medium) -> medium
                 isValidPhoto(full) -> full
-                else -> EMPTY_PHOTO
+                else -> NO_SIZE_AVAILABLE
             }
         }
 
+        /**
+         * 사진 링크가 유효한지 확인한다.
+         *
+         * @param photo 사진 링크
+         * @return 유효 여부
+         */
         private fun isValidPhoto(photo: String): Boolean {
             return photo.isNotEmpty()
         }

@@ -3,7 +3,7 @@ package com.realworld.android.petsave.common.domain.model.animal
 import java.time.LocalDateTime
 
 /**
- * 동물
+ * 동물에 대한 정보
  *
  * @property id
  * @property name

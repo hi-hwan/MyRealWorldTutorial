@@ -34,6 +34,20 @@
 
 package com.realworld.android.petsave.common.domain.model.animal.details
 
+/**
+ * 품종에 대한 정보
+ *
+ * 예시
+ * "breeds": {
+ *   "primary": "Golden Retriever",
+ *   "secondary": null,
+ *   "mixed": false,
+ *   "unknown": false
+ * }
+ *
+ * @property primary
+ * @property secondary
+ */
 data class Breed(val primary: String, val secondary: String) {
     val mixed: Boolean
         get() = primary.isNotEmpty() && secondary.isNotEmpty()

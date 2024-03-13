@@ -59,7 +59,8 @@ data class Media(
     ) {
 
         companion object {
-            private const val NO_SIZE_AVAILABLE = ""
+            // Null 객체 패턴의 단순화된 버전
+            const val NO_SIZE_AVAILABLE = ""
         }
 
         /**

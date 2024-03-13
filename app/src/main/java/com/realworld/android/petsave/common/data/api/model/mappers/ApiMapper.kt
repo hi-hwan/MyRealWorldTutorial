@@ -34,6 +34,11 @@
 
 package com.realworld.android.petsave.common.data.api.model.mappers
 
+
+// 데이터를 도메인 레이어에 매핑하는 일반적인 방법에는 두 가지가 있다.
+// 하나는 인터페이스와 독립적인 클래스를 사용하는 것이고,
+// 다른 하나는 모델의 정적 또는 멤버 함수를 사용하는 것이다.
+// 여기서는 인터페이스 사용한다.
 interface ApiMapper<E, D> {
 
     fun mapToDomain(apiEntity: E): D

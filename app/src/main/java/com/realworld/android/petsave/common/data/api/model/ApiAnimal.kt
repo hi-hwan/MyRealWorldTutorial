@@ -37,6 +37,8 @@ package com.realworld.android.petsave.common.data.api.model
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
+// generateAdapter 가 true 로 설정하면 Moshi가 자동으로 어댑터를 생성한다.
+// 그 후 클래스의 인스턴스를 생성한다.
 @JsonClass(generateAdapter = true)
 data class ApiAnimal(
     @field:Json(name = "id") val id: Long?,

@@ -38,6 +38,7 @@ import com.realworld.android.logging.Logger
 import okhttp3.logging.HttpLoggingInterceptor
 import javax.inject.Inject
 
+// 요청 세부 정보를 Logcat에 기록
 class LoggingInterceptor @Inject constructor() : HttpLoggingInterceptor.Logger {
     override fun log(message: String) {
         Logger.i(message)

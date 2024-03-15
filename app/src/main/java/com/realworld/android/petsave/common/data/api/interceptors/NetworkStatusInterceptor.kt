@@ -32,20 +32,24 @@
  * THE SOFTWARE.
  */
 
-package com.realworld.android.petsave.common.domain.model.animal.details
+package com.realworld.android.petsave.common.data.api.interceptors
 
-import com.realworld.android.petsave.common.domain.model.organization.Organization
+import com.realworld.android.petsave.common.data.api.ConnectionManager
+import com.realworld.android.petsave.common.domain.model.NetworkUnavailableException
+import okhttp3.Interceptor
+import okhttp3.Response
+import javax.inject.Inject
 
-data class Details(
-    val description: String,
-    val age: Age,
-    val species: String,
-    val breed: Breed,
-    val colors: Colors,
-    val gender: Gender,
-    val size: Size,
-    val coat: Coat,
-    val healthDetails: HealthDetails,
-    val habitatAdaptation: HabitatAdaptation,
-    val organization: Organization
-)
+// ConnectionManager를 사용하여 인터넷 연결을 확인한 다음 사용자 지정,
+// NetworkUnavailableException을 던지거나 Request를 계속 진행
+class NetworkStatusInterceptor @Inject constructor(
+    private val connectionManager: ConnectionManager
+) : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        return if (connectionManager.isConnected) {
+            chain.proceed(chain.request())
+        } else {
+            throw NetworkUnavailableException()
+        }
+    }
+}

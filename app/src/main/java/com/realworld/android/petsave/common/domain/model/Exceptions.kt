@@ -34,5 +34,14 @@
 
 package com.realworld.android.petsave.common.domain.model
 
+import java.io.IOException
 
-class NoMoreAnimalsException(message: String) : Exception(message)
+
+class NoMoreAnimalsException(message: String): Exception(message)
+
+// IOException을 확장한다. 여기서부터 레이어 간의 경계가 모호해지기 시작한다.
+// Retrofit은 IOException만 처리하기 때문에 IOException을 확장한다.
+// 따라서 NetworkUnavailableException이 다른 유형에서 확장되면 앱이 충돌할 수 있다.
+// 이는 도메인 계층과 데이터 계층을 암시적으로 결합한다.
+// 언젠가 앱이 예외를 다르게 처리하는 라이브러리를 선호하여 Retrofit 사용을 중단하면 도메인 계층도 변경된다.
+class NetworkUnavailableException(message: String = "No network available :(") : IOException(message)

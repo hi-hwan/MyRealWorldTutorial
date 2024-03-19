@@ -59,9 +59,9 @@ data class ApiToken(
         }
 
     fun isValid(): Boolean {
-        return tokenType != null && tokenType.isNotEmpty() &&
+        return !tokenType.isNullOrEmpty() &&
                 expiresInSeconds != null && expiresInSeconds >= 0 &&
-                accessToken != null && accessToken.isNotEmpty()
+                !accessToken.isNullOrEmpty()
     }
 
 }

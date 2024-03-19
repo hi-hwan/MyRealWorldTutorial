@@ -46,6 +46,7 @@ import com.realworld.android.petsave.common.data.api.model.ApiToken
 import com.realworld.android.petsave.common.data.preferences.Preferences
 import com.squareup.moshi.Moshi
 import okhttp3.*
+import java.time.Instant
 import javax.inject.Inject
 
 // Token 만료를 확인한 후 필요한 경우 새 토큰을 요청하여 저장,
@@ -59,7 +60,39 @@ class AuthenticationInterceptor @Inject constructor(
     }
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        return chain.proceed(chain.request())
+        val token = preferences.getToken()
+        // 토큰의 만료 시간
+        val tokenExpirationTime = Instant.ofEpochSecond(preferences.getTokenExpirationTime())
+        val request = chain.request()
+
+        // 인증이 필요하지 않는 특별한 요청
+        // if (chain.request().headers[NO_AUTH_HEADER] != null) return chain.proceed(request)
+
+        val interceptedRequest: Request
+        if (tokenExpirationTime.isAfter(Instant.now())) {
+            // 유효한 토큰
+            // 인증된 Request 생성 (Request 생성 및 Auth header 추가)
+            interceptedRequest = chain.createAuthenticatedRequest(token)
+        } else {
+            // 유효하지 않은 토큰
+            // 토큰 재생성 및 저장
+            val tokenRefreshResponse = chain.refreshToken()
+            interceptedRequest = if (tokenRefreshResponse.isSuccessful) {
+                val newToken = mapToken(tokenRefreshResponse)
+                if (newToken.isValid()) {
+                    storeNewToken(newToken)
+                    chain.createAuthenticatedRequest(newToken.accessToken!!)
+                } else {
+                    request
+                }
+            } else {
+                request
+            }
+        }
+
+        // proceed 호출 및 모든 HTTP 마법을 수행하여 Response 반환
+        // 401 코드가 있으면 토큰을 삭제
+        return chain.proceedDeletingTokenIfUnauthorized(interceptedRequest)
     }
 
     private fun Interceptor.Chain.createAuthenticatedRequest(token: String): Request {

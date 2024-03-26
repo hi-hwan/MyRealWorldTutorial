@@ -11,7 +11,11 @@ buildscript {
         appcompat_version = "1.6.1"
         constraint_layout_version = "2.1.4"
         junit_version = "4.13.2"
+        google_truth_version = "1.1.2"
+        mockito_version = "3.9.0"
+        robolectric_version = "4.11.1"
         androidx_junit_version = "1.1.5"
+        androidx_core_testing_version = "2.1.0"
         espresso_version = "3.5.1"
         room_version = "2.6.1"
         rxjava_version = '2.2.21'

@@ -49,9 +49,10 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
 
+// object 로 만들면 Dagger가 객체 인스턴스를 생성하는 비용을 들이지 않고도 종속성을 제송할 수 있다.
 @InstallIn(SingletonComponent::class)
 @Module
-class ApiModule {
+object ApiModule {
 
     @Provides
     @Singleton

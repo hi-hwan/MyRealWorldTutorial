@@ -62,7 +62,6 @@ dependencies {
     // Support Libraries
     implementation "androidx.appcompat:appcompat:$appcompat_version"
     implementation "androidx.constraintlayout:constraintlayout:$constraint_layout_version"
-    implementation 'androidx.test:monitor:1.6.1'
 
     // Testing Dependencies
     testImplementation "junit:junit:$junit_version"
@@ -122,6 +121,5 @@ dependencies {
 
     // Utils
     coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar_jdk_libs_version"
-
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakcanary_version"
 }

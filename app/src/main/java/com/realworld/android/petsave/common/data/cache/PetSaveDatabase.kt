@@ -45,8 +45,9 @@ import com.realworld.android.petsave.common.data.cache.model.cachedorganization.
         CachedPhoto::class,
         CachedVideo::class,
         CachedTag::class,
+        CachedAnimalWithDetails::class,
+        CachedOrganization::class,
         CachedAnimalTagCrossRef::class,
-        CachedOrganization::class
     ],
     version = 1
 )

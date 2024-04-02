@@ -37,7 +37,10 @@ package com.realworld.android.petsave.common.data.cache.model.cachedanimal
 import androidx.room.Entity
 import androidx.room.Index
 
-@Entity(primaryKeys = ["animalId", "tag"], indices = [Index("tag")])
+@Entity(
+    primaryKeys = ["animalId", "tag"], // 복합 기본 키 정의, 기본 키는 항상 두 열의 조합
+    indices = [Index("tag")] // 기본적으로 둘 다 인덱싱이 되지만, 여기서는 tag만 명시적으로 인덱싱, 이유는 
+)
 data class CachedAnimalTagCrossRef(
     val animalId: Long,
     val tag: String

@@ -35,10 +35,23 @@
 package com.realworld.android.petsave.common.data.cache.model.cachedanimal
 
 import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.realworld.android.petsave.common.domain.model.animal.Media
 
-@Entity(tableName = "photos")
+@Entity(
+    tableName = "photos",
+    foreignKeys = [
+        ForeignKey(
+            entity = CachedAnimalWithDetails::class, // 외래 키가 속한 엔티티를 지정
+            parentColumns = ["animalId"], // 부모 테이블인 [CachedAnimalWithDetails]에서 외래 키와 일치하는 열을 정의
+            childColumns = ["animalId"], // 외래 키가 있는 열을 정의
+            onDelete = ForeignKey.CASCADE // 부모 엔티티가 삭제되면 Room에게 해당 엔티티를 삭제하라고 지시
+        )
+    ],
+    indices = [Index("animalId")] // 외래 키를 인덴싱된 열로 설정
+)
 data class CachedPhoto(
     @PrimaryKey(autoGenerate = true)
     val photoId: Long = 0,

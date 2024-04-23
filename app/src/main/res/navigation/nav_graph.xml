@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -11,5 +10,11 @@
         android:id="@+id/animalsNearYou"
         android:name="com.realworld.android.petsave.animalsnearyou.presentation.AnimalsNearYouFragment"
         android:label="@string/animals_near_you_screen_label"
-        tools:layout="@layout/fragment_animals_near_you" />
+        tools:layout="@layout/fragment_animals_near_you"></fragment>
+
+    <fragment
+        android:id="@+id/search"
+        android:name="com.realworld.android.petsave.search.presentation.SearchFragment"
+        android:label="@string/search_screen_label"
+        tools:layout="@layout/fragment_search"></fragment>
 </navigation>

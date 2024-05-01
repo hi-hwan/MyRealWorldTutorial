@@ -38,10 +38,12 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.realworld.android.petsave.R
 import com.realworld.android.petsave.databinding.ActivityMainBinding
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * Main Screen
  */
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding

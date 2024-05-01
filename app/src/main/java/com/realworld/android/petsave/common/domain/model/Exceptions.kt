@@ -45,3 +45,5 @@ class NoMoreAnimalsException(message: String): Exception(message)
 // 이는 도메인 계층과 데이터 계층을 암시적으로 결합한다.
 // 언젠가 앱이 예외를 다르게 처리하는 라이브러리를 선호하여 Retrofit 사용을 중단하면 도메인 계층도 변경된다.
 class NetworkUnavailableException(message: String = "No network available :(") : IOException(message)
+
+class NetworkException(message: String): Exception(message)

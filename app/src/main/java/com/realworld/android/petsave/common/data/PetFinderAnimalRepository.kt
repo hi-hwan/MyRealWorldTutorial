@@ -7,11 +7,13 @@ import com.realworld.android.petsave.common.data.cache.Cache
 import com.realworld.android.petsave.common.data.cache.model.cachedanimal.CachedAnimalAggregate
 import com.realworld.android.petsave.common.data.cache.model.cachedorganization.CachedOrganization
 import com.realworld.android.petsave.common.data.di.CacheModule
+import com.realworld.android.petsave.common.domain.model.NetworkException
 import com.realworld.android.petsave.common.domain.model.animal.Animal
 import com.realworld.android.petsave.common.domain.model.animal.details.AnimalWithDetails
 import com.realworld.android.petsave.common.domain.model.pagination.PaginatedAnimals
 import com.realworld.android.petsave.common.domain.repositories.AnimalRepository
 import io.reactivex.Flowable
+import retrofit2.HttpException
 import javax.inject.Inject
 
 class PetFinderAnimalRepository @Inject constructor(
@@ -35,19 +37,23 @@ class PetFinderAnimalRepository @Inject constructor(
     }
 
     override suspend fun requestMoreAnimals(pageToLoad: Int, numberOfItems: Int): PaginatedAnimals {
-        val (apiAnimals, apiPagination) = api.getNearbyAnimals(
-            pageToLoad,
-            numberOfItems,
-            postcode,
-            maxDistanceMiles
-        )
+        try {
+            val (apiAnimals, apiPagination) = api.getNearbyAnimals(
+                pageToLoad,
+                numberOfItems,
+                postcode,
+                maxDistanceMiles
+            )
 
-        return PaginatedAnimals(
-            apiAnimals?.map {
-                apiAnimalMapper.mapToDomain(it)
-            }.orEmpty(),
-            apiPaginationMapper.mapToDomain(apiPagination)
-        )
+            return PaginatedAnimals(
+                apiAnimals?.map {
+                    apiAnimalMapper.mapToDomain(it)
+                }.orEmpty(),
+                apiPaginationMapper.mapToDomain(apiPagination)
+            )
+        } catch (e: HttpException) {
+            throw NetworkException(e.message ?: "Code ${e.code()}")
+        }
     }
 
     // Temporary
@@ -55,6 +61,9 @@ class PetFinderAnimalRepository @Inject constructor(
     private val maxDistanceMiles = 100
 
     override suspend fun storeAnimals(animals: List<AnimalWithDetails>) {
+        // Organizations have a 1-to-many relation with animals, so we need to insert them first in
+        // order for Room not to complain about foreign keys being invalid (since we have the
+        // organizationId as a foreign key in the animals table)
         val organizations = animals.map { CachedOrganization.fromDomain(it.details.organization) }
 
         cache.storeOrganizations(organizations)

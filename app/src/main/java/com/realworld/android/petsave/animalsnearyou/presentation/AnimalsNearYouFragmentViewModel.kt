@@ -3,16 +3,22 @@ package com.realworld.android.petsave.animalsnearyou.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.realworld.android.logging.Logger
+import com.realworld.android.petsave.animalsnearyou.domain.usecases.GetAnimals
 import com.realworld.android.petsave.animalsnearyou.domain.usecases.RequestNextPageOfAnimals
 import com.realworld.android.petsave.common.domain.model.NetworkException
 import com.realworld.android.petsave.common.domain.model.NetworkUnavailableException
 import com.realworld.android.petsave.common.domain.model.NoMoreAnimalsException
 import com.realworld.android.petsave.common.domain.model.pagination.Pagination
 import com.realworld.android.petsave.common.presentation.Event
+import com.realworld.android.petsave.common.presentation.model.UIAnimal
 import com.realworld.android.petsave.common.presentation.model.mappers.UiAnimalMapper
+import com.realworld.android.petsave.common.utils.DispatchersProvider
 import com.realworld.android.petsave.common.utils.createExceptionHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,13 +28,29 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AnimalsNearYouFragmentViewModel @Inject constructor(
+    private val getAnimals: GetAnimals,
     private val requestNextPageOfAnimals: RequestNextPageOfAnimals,
     private val uiAnimalMapper: UiAnimalMapper,
+    private val dispatchersProvider: DispatchersProvider,
     private val compositeDisposable: CompositeDisposable, // For RxJava
 ) : ViewModel() {
 
+    companion object {
+        const val UI_PAGE_SIZE = Pagination.DEFAULT_PAGE_SIZE
+    }
+
+    init {
+        subscribeToAnimalUpdates()
+    }
+
     private val _state = MutableStateFlow(AnimalsNearYouViewState())
     val state = _state.asStateFlow()
+
+    val isLastPage: Boolean
+        get() = state.value.noMoreAnimalsNearby
+
+    var isLoadingMoreAnimals: Boolean = false
+        private set
 
     private var currentPage = 0
 
@@ -40,6 +62,32 @@ class AnimalsNearYouFragmentViewModel @Inject constructor(
     fun onEvent(event: AnimalsNearYouEvent) {
         when (event) {
             is AnimalsNearYouEvent.RequestInitialAnimalsList -> loadAnimals()
+            is AnimalsNearYouEvent.RequestMoreAnimals -> loadNextAnimalPage()
+        }
+    }
+
+    private fun subscribeToAnimalUpdates() {
+        getAnimals()
+            .map { animals -> animals.map { uiAnimalMapper.mapToView(it) } }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { onNewAnimalList(it) },
+                { onFailure(it) }
+            )
+            .addTo(compositeDisposable)
+    }
+
+    private fun onNewAnimalList(animals: List<UIAnimal>) {
+        Logger.d("Got more animals!")
+
+        val updatedAnimalSet = (state.value.animals + animals).toSet()
+
+        _state.update { oldState ->
+            oldState.copy(
+                loading = false,
+                animals = updatedAnimalSet.toList()
+            )
         }
     }
 
@@ -50,6 +98,7 @@ class AnimalsNearYouFragmentViewModel @Inject constructor(
     }
 
     private fun loadNextAnimalPage() {
+        isLoadingMoreAnimals = true
         val errorMessage = "Failed to fetch nearby animals"
         val exceptionHandler = viewModelScope.createExceptionHandler(errorMessage) {
             onFailure(it)
@@ -60,6 +109,7 @@ class AnimalsNearYouFragmentViewModel @Inject constructor(
             val pagination = requestNextPageOfAnimals(++currentPage)
 
             onPaginationInfoObtained(pagination)
+            isLoadingMoreAnimals = false
         }
     }
 
@@ -78,6 +128,7 @@ class AnimalsNearYouFragmentViewModel @Inject constructor(
                     )
                 }
             }
+
             is NoMoreAnimalsException -> {
                 _state.update { oldState ->
                     oldState.copy(

@@ -32,21 +32,38 @@
  * THE SOFTWARE.
  */
 
-package com.realworld.android.petsave.common.data.cache
+package com.realworld.android.petsave.search.domain.usecases
 
-import com.realworld.android.petsave.common.data.cache.model.cachedanimal.CachedAnimalAggregate
-import com.realworld.android.petsave.common.data.cache.model.cachedorganization.CachedOrganization
-import io.reactivex.Flowable
+import com.realworld.android.petsave.common.domain.model.NoMoreAnimalsException
+import com.realworld.android.petsave.common.domain.model.pagination.Pagination
+import com.realworld.android.petsave.common.domain.model.pagination.Pagination.Companion.DEFAULT_PAGE_SIZE
+import com.realworld.android.petsave.common.domain.repositories.AnimalRepository
+import com.realworld.android.petsave.common.utils.DispatchersProvider
+import com.realworld.android.petsave.search.domain.model.SearchParameters
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-interface Cache {
-    fun storeOrganizations(organizations: List<CachedOrganization>)
-    fun getNearbyAnimals(): Flowable<List<CachedAnimalAggregate>>
-    suspend fun storeNearbyAnimals(animals: List<CachedAnimalAggregate>)
-    suspend fun getAllTypes(): List<String>
+class SearchAnimalsRemotely @Inject constructor(
+    private val animalRepository: AnimalRepository,
+    private val dispatchersProvider: DispatchersProvider
+) {
 
-    fun searchAnimalsBy(
-        name: String,
-        age: String,
-        type: String
-    ): Flowable<List<CachedAnimalAggregate>>
+    suspend operator fun invoke(
+        pageToLoad: Int,
+        searchParameters: SearchParameters,
+        pageSize: Int = DEFAULT_PAGE_SIZE
+    ): Pagination {
+        return withContext(dispatchersProvider.io()) {
+            val (animals, pagination) =
+                animalRepository.searchAnimalsRemotely(pageToLoad, searchParameters, pageSize)
+
+            if (animals.isEmpty()) {
+                throw NoMoreAnimalsException("Couldn't find more animals that match the search parameters.")
+            }
+
+            animalRepository.storeAnimals(animals)
+
+            return@withContext pagination
+        }
+    }
 }

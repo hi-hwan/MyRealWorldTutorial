@@ -71,13 +71,21 @@ dependencies {
 
     // Testing Dependencies
     testImplementation "junit:junit:$junit_version"
-    testImplementation "com.google.truth:truth:$google_truth_version"
     testImplementation "org.mockito:mockito-core:$mockito_version"
     testImplementation "org.robolectric:robolectric:$robolectric_version"
-    androidTestImplementation "com.google.truth:truth:$google_truth_version"
+
+    // Instrumented tests dependencies
     androidTestImplementation "androidx.test.ext:junit:$androidx_junit_version"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
-    androidTestImplementation "androidx.arch.core:core-testing:$androidx_core_testing_version"
+
+    // Dependencies for both test and AndroidTest
+    debugImplementation "com.google.truth:truth:$google_truth_version"
+    debugImplementation "androidx.arch.core:core-testing:$androidx_core_testing_version"
+    debugImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_test_version"
+    debugImplementation ("androidx.fragment:fragment-testing:$fragment_testing_version") {
+        exclude group: 'androidx.test', module: 'monitor'
+    }
+    debugImplementation "androidx.fragment:fragment-testing-manifest:$fragment_testing_version"
 
     // TUTORIAL DEPENDENCIES HERE
 

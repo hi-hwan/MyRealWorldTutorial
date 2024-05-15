@@ -20,11 +20,14 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
+import java.util.concurrent.CancellationException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -43,6 +46,7 @@ class SearchFragmentViewModel @Inject constructor(
     private val ageSubject = BehaviorSubject.createDefault("")
     private val typeSubject = BehaviorSubject.createDefault("")
 
+    private var remoteSearchJob: Job = Job()
 
     val state: StateFlow<SearchViewState> = _state.asStateFlow()
 
@@ -54,11 +58,15 @@ class SearchFragmentViewModel @Inject constructor(
     }
 
     private fun onSearchParametersUpdate(event: SearchEvent) {
+        remoteSearchJob.cancel(
+            CancellationException("New search parameters incoming!")
+        )
+
         when (event) {
             is SearchEvent.QueryInput -> updateQuery(event.input)
             is SearchEvent.AgeValueSelected -> updateAgeValue(event.age)
             is SearchEvent.TypeValueSelected -> updateTypeValue(event.type)
-            else -> {}
+            else -> Logger.d("Wrong SearchEvent in onSearchParametersUpdates!")
         }
     }
 
@@ -97,7 +105,7 @@ class SearchFragmentViewModel @Inject constructor(
     private fun searchRemotely(searchParameters: SearchParameters) {
         val exceptionHandler = createExceptionHandler(message = "Failed to search remotely.")
 
-        viewModelScope.launch(exceptionHandler) {
+        remoteSearchJob = viewModelScope.launch(exceptionHandler) {
             Logger.d("Searching remotely...")
             val pagination = searchAnimalsRemotely(
                 ++currentPage,

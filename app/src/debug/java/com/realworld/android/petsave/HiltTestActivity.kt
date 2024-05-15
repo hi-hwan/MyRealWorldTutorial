@@ -32,21 +32,10 @@
  * THE SOFTWARE.
  */
 
-package com.realworld.android.petsave.common.presentation
+package com.realworld.android.petsave
 
-data class Event<out T>(private val content: T) {
+import androidx.appcompat.app.AppCompatActivity
+import dagger.hilt.android.AndroidEntryPoint
 
-    private var hasBeenHandled = false
-
-    /**
-     * Returns the content and prevents its use again.
-     */
-    fun getContentIfNotHandled(): T? {
-        return if (hasBeenHandled) {
-            null
-        } else {
-            hasBeenHandled = true
-            content
-        }
-    }
-}
+@AndroidEntryPoint
+class HiltTestActivity : AppCompatActivity()

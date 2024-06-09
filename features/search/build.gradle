@@ -1,0 +1,25 @@
+apply from: "$rootProject.projectDir/android-library.gradle"
+
+android {
+    namespace 'com.realworld.android.petsave.search'
+
+    sourceSets {
+        androidTest {
+            java.srcDirs += [
+                    "${project(':common').projectDir}/src/androidTest/java"
+            ]
+        }
+    }
+}
+
+dependencies {
+    implementation project(":common")
+
+    androidTestImplementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    androidTestImplementation "com.squareup.okhttp3:logging-interceptor:$okHttp_version"
+    androidTestImplementation "androidx.room:room-runtime:$room_version"
+    androidTestImplementation "com.squareup.okhttp3:mockwebserver:$okHttp_version"
+
+    // Navigation
+    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
+}

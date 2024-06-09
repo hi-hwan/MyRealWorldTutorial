@@ -46,6 +46,7 @@
             "columnNames": [
               "animalId"
             ],
+            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_photos_animalId` ON `${TABLE_NAME}` (`animalId`)"
           }
         ],
@@ -99,6 +100,7 @@
             "columnNames": [
               "animalId"
             ],
+            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_videos_animalId` ON `${TABLE_NAME}` (`animalId`)"
           }
         ],
@@ -298,6 +300,7 @@
             "columnNames": [
               "organizationId"
             ],
+            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_animals_organizationId` ON `${TABLE_NAME}` (`organizationId`)"
           }
         ],
@@ -420,6 +423,7 @@
             "columnNames": [
               "tag"
             ],
+            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_CachedAnimalTagCrossRef_tag` ON `${TABLE_NAME}` (`tag`)"
           }
         ],

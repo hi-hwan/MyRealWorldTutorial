@@ -14,5 +14,9 @@ dependencyResolutionManagement {
 }
 
 include ':logging'
-rootProject.name = 'PetSave'
 include ':app'
+include ':features:animalsnearyou'
+include ':features:search'
+include ':common'
+
+rootProject.name = 'PetSave'

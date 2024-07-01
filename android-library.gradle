@@ -48,42 +48,11 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    // Support Libraries
-    implementation "androidx.constraintlayout:constraintlayout:$constraint_layout_version"
-
-    // Testing Dependencies
-    testImplementation "junit:junit:$junit_version"
-    testImplementation "org.mockito:mockito-core:$mockito_version"
-    testImplementation "org.robolectric:robolectric:$robolectric_version"
-
-    // Instrumented tests dependencies
-    androidTestImplementation "androidx.test.ext:junit:$androidx_junit_version"
-    androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
-
-    // Dependencies for both test and AndroidTest
-    debugImplementation "com.google.truth:truth:$google_truth_version"
-    debugImplementation "androidx.arch.core:core-testing:$androidx_core_testing_version"
-    debugImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_test_version"
-    debugImplementation("androidx.fragment:fragment-testing:$fragment_testing_version") {
-        exclude group: 'androidx.test', module: 'monitor'
-    }
-    debugImplementation "androidx.fragment:fragment-testing-manifest:$fragment_testing_version"
-
-    // TUTORIAL DEPENDENCIES HERE
-
     // Modules
     implementation project(":logging")
 
-    // Network
-    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
-    implementation "com.squareup.retrofit2:converter-moshi:$moshi_converter_version"
-    implementation "com.squareup.okhttp3:okhttp:$okHttp_version"
-    implementation "com.squareup.okhttp3:logging-interceptor:$okHttp_version"
-    implementation "com.squareup.moshi:moshi-kotlin:$moshi_version"
-    ksp "com.squareup.moshi:moshi-kotlin-codegen:$moshi_version"
-
-    testImplementation "com.squareup.okhttp3:mockwebserver:$okHttp_version"
-    androidTestImplementation "com.squareup.okhttp3:mockwebserver:$okHttp_version"
+    // Constraint Layout
+    implementation "androidx.constraintlayout:constraintlayout:$constraint_layout_version"
 
     // Concurrency
     implementation "io.reactivex.rxjava2:rxjava:$rxjava_version"
@@ -103,13 +72,25 @@ dependencies {
 
     implementation "com.google.android.material:material:$material_version"
 
-    // Navigation
-    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
-    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
-
-    androidTestImplementation "androidx.navigation:navigation-testing:$nav_version"
-
     // Utils
     coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar_jdk_libs_version"
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakcanary_version"
+
+    // Testing Dependencies
+    testImplementation "junit:junit:$junit_version"
+    testImplementation "org.mockito:mockito-core:$mockito_version"
+    testImplementation "org.robolectric:robolectric:$robolectric_version"
+
+    // Instrumented tests dependencies
+    androidTestImplementation "androidx.test.ext:junit:$androidx_junit_version"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
+
+    // Dependencies for both test and AndroidTest
+    debugImplementation "com.google.truth:truth:$google_truth_version"
+    debugImplementation "androidx.arch.core:core-testing:$androidx_core_testing_version"
+    debugImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_test_version"
+    debugImplementation("androidx.fragment:fragment-testing:$fragment_testing_version") {
+        exclude group: 'androidx.test', module: 'monitor'
+    }
+    debugImplementation "androidx.fragment:fragment-testing-manifest:$fragment_testing_version"
 }

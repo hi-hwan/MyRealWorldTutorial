@@ -46,9 +46,9 @@ dependencies {
     implementation "com.google.android.material:material:$material_version"
 
     // Modules
-    implementation project(":common")
     implementation project(":features:animalsnearyou")
     implementation project(":features:search")
+    implementation project(":common")
     implementation project(":logging")
 
     // DI

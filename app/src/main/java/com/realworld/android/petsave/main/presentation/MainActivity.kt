@@ -32,7 +32,7 @@
  * THE SOFTWARE.
  */
 
-package com.realworld.android.petsave.common
+package com.realworld.android.petsave.main.presentation
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

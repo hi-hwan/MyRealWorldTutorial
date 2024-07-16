@@ -17,6 +17,7 @@ include ':logging'
 include ':app'
 include ':features:animalsnearyou'
 include ':features:search'
+include ':features:onboarding'
 include ':common'
 
 rootProject.name = 'PetSave'

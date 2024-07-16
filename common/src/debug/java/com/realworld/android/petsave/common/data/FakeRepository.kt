@@ -200,6 +200,13 @@ class FakeRepository @Inject constructor() : AnimalRepository {
         )
     }
 
+    override suspend fun storeOnboardingData(postcode: String, distance: Int) {
+        // Not needed for now
+    }
+
+    override suspend fun onboardingIsComplete(): Boolean {
+        return true
+    }
 
     private fun AnimalWithDetails.toAnimal(): Animal {
         return Animal(id, name, type, media, tags, adoptionStatus, publishedAt)

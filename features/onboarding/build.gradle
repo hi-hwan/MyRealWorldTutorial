@@ -1,0 +1,13 @@
+apply from: "$rootProject.projectDir/android-library.gradle"
+
+android {
+    namespace 'com.realworld.android.petsave.onboarding'
+}
+
+dependencies {
+    implementation project(":common")
+
+    // Navigation
+    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
+    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+}

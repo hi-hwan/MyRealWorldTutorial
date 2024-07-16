@@ -6,15 +6,15 @@ import com.realworld.android.petsave.common.data.api.model.mappers.ApiPagination
 import com.realworld.android.petsave.common.data.cache.Cache
 import com.realworld.android.petsave.common.data.cache.model.cachedanimal.CachedAnimalAggregate
 import com.realworld.android.petsave.common.data.cache.model.cachedorganization.CachedOrganization
-import com.realworld.android.petsave.common.data.di.CacheModule
+import com.realworld.android.petsave.common.data.preferences.Preferences
 import com.realworld.android.petsave.common.domain.model.NetworkException
 import com.realworld.android.petsave.common.domain.model.animal.Animal
 import com.realworld.android.petsave.common.domain.model.animal.details.Age
 import com.realworld.android.petsave.common.domain.model.animal.details.AnimalWithDetails
 import com.realworld.android.petsave.common.domain.model.pagination.PaginatedAnimals
-import com.realworld.android.petsave.common.domain.repositories.AnimalRepository
 import com.realworld.android.petsave.common.domain.model.search.SearchParameters
 import com.realworld.android.petsave.common.domain.model.search.SearchResults
+import com.realworld.android.petsave.common.domain.repositories.AnimalRepository
 import io.reactivex.Flowable
 import retrofit2.HttpException
 import javax.inject.Inject
@@ -22,6 +22,7 @@ import javax.inject.Inject
 class PetFinderAnimalRepository @Inject constructor(
     private val api: PetFinderApi,
     private val cache: Cache,
+    private val preferences: Preferences,
     private val apiAnimalMapper: ApiAnimalMapper,
     private val apiPaginationMapper: ApiPaginationMapper
 ) : AnimalRepository {
@@ -40,6 +41,9 @@ class PetFinderAnimalRepository @Inject constructor(
     }
 
     override suspend fun requestMoreAnimals(pageToLoad: Int, numberOfItems: Int): PaginatedAnimals {
+        val postcode = preferences.getPostcode()
+        val maxDistanceMiles = preferences.getMaxDistanceAllowedToGetAnimals()
+
         try {
             val (apiAnimals, apiPagination) = api.getNearbyAnimals(
                 pageToLoad,
@@ -58,10 +62,6 @@ class PetFinderAnimalRepository @Inject constructor(
             throw NetworkException(e.message ?: "Code ${e.code()}")
         }
     }
-
-    // Temporary
-    private val postcode = "07097"
-    private val maxDistanceMiles = 100
 
     override suspend fun storeAnimals(animals: List<AnimalWithDetails>) {
         // Organizations have a 1-to-many relation with animals, so we need to insert them first in
@@ -106,6 +106,9 @@ class PetFinderAnimalRepository @Inject constructor(
         numberOfItems: Int
     ): PaginatedAnimals {
 
+        val postcode = preferences.getPostcode()
+        val maxDistanceMiles = preferences.getMaxDistanceAllowedToGetAnimals()
+
         val (apiAnimals, apiPagination) = api.searchAnimalsBy(
             searchParameters.name,
             searchParameters.age,
@@ -120,5 +123,17 @@ class PetFinderAnimalRepository @Inject constructor(
             apiAnimals?.map { apiAnimalMapper.mapToDomain(it) }.orEmpty(),
             apiPaginationMapper.mapToDomain(apiPagination)
         )
+    }
+
+    override suspend fun storeOnboardingData(postcode: String, distance: Int) {
+        with(preferences) {
+            putPostcode(postcode)
+            putMaxDistanceAllowedToGetAnimals(distance)
+        }
+    }
+
+    override suspend fun onboardingIsComplete(): Boolean {
+        return preferences.getPostcode().isNotEmpty() &&
+                preferences.getMaxDistanceAllowedToGetAnimals() > 0
     }
 }

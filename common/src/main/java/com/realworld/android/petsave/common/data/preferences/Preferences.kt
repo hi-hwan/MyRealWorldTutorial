@@ -49,4 +49,12 @@ interface Preferences {
     fun getTokenType(): String
 
     fun deleteTokenInfo()
+
+    fun getPostcode(): String
+
+    fun putPostcode(postcode: String)
+
+    fun getMaxDistanceAllowedToGetAnimals(): Int
+
+    fun putMaxDistanceAllowedToGetAnimals(distance: Int)
 }

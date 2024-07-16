@@ -53,11 +53,11 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.realworld.android.petsave.common.presentation.AnimalsAdapter
 import com.realworld.android.petsave.common.presentation.Event
-import com.realworld.android.petsave.search.R
 import com.realworld.android.petsave.search.databinding.FragmentSearchBinding
 import com.realworld.android.petsave.search.domain.usecases.GetSearchFilters
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import com.realworld.android.petsave.common.R as commonR
 
 @AndroidEntryPoint
 class SearchFragment : Fragment() {
@@ -166,7 +166,7 @@ class SearchFragment : Fragment() {
     private fun handleFailures(failure: Event<Throwable>?) {
         val unhandledFailure = failure?.getContentIfNotHandled() ?: return
 
-        val fallbackMessage = getString(com.realworld.android.petsave.common.R.string.an_error_occurred)
+        val fallbackMessage = getString(commonR.string.an_error_occurred)
         val snackbarMessage = if (unhandledFailure.message.isNullOrEmpty()) {
             fallbackMessage
         } else {
@@ -198,7 +198,7 @@ class SearchFragment : Fragment() {
     private fun createFilterAdapter(adapterValues: List<String>): ArrayAdapter<String> {
         return ArrayAdapter(
             requireContext(),
-            R.layout.dropdown_menu_popup_item,
+            com.realworld.android.petsave.search.R.layout.dropdown_menu_popup_item,
             adapterValues
         )
     }

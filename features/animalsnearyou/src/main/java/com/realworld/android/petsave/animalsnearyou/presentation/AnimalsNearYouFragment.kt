@@ -13,12 +13,12 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
-import com.realworld.android.petsave.animalsnearyou.R
 import com.realworld.android.petsave.animalsnearyou.databinding.FragmentAnimalsNearYouBinding
 import com.realworld.android.petsave.common.presentation.AnimalsAdapter
 import com.realworld.android.petsave.common.presentation.Event
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import com.realworld.android.petsave.common.R as commonR
 
 @AndroidEntryPoint
 class AnimalsNearYouFragment : Fragment() {
@@ -77,8 +77,11 @@ class AnimalsNearYouFragment : Fragment() {
             layoutManager,
             AnimalsNearYouFragmentViewModel.UI_PAGE_SIZE
         ) {
-            override fun loadMoreItems() { requestMoreAnimals() }
-            override fun isLoading(): Boolean  = viewModel.isLoadingMoreAnimals
+            override fun loadMoreItems() {
+                requestMoreAnimals()
+            }
+
+            override fun isLoading(): Boolean = viewModel.isLoadingMoreAnimals
             override fun isLastPage(): Boolean = viewModel.isLastPage
         }
     }
@@ -114,7 +117,7 @@ class AnimalsNearYouFragment : Fragment() {
     private fun handleFailures(failure: Event<Throwable>?) {
         val unhandledFailure = failure?.getContentIfNotHandled() ?: return
 
-        val fallbackMessage = getString(com.realworld.android.petsave.common.R.string.an_error_occurred)
+        val fallbackMessage = getString(commonR.string.an_error_occurred)
         val snackbarMessage = if (unhandledFailure.message.isNullOrEmpty()) {
             fallbackMessage
         } else {

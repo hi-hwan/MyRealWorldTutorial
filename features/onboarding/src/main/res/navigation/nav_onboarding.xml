@@ -9,13 +9,5 @@
         android:id="@+id/onboardingFragment"
         android:name="com.realworld.android.petsave.onboarding.presentation.OnboardingFragment"
         android:label="@string/onboarding_screen_label"
-        tools:layout="@layout/fragment_onboarding">
-        <action
-            android:id="@+id/action_onboardingFragment_to_animalsNearYou"
-            app:destination="@id/nav_animalsnearyou"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popUpTo="@id/onboardingFragment"
-            app:popUpToInclusive="true" />
-    </fragment>
+        tools:layout="@layout/fragment_onboarding" />
 </navigation>

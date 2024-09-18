@@ -45,6 +45,8 @@ import com.realworld.android.petsave.common.utils.setImage
 
 class AnimalsAdapter : ListAdapter<UIAnimal, AnimalsAdapter.AnimalsViewHolder>(ITEM_COMPARATOR) {
 
+    private var animalClickListener: AnimalClickListener? = null
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AnimalsViewHolder {
         val binding = RecyclerViewAnimalItemBinding
             .inflate(LayoutInflater.from(parent.context), parent, false)
@@ -65,7 +67,15 @@ class AnimalsAdapter : ListAdapter<UIAnimal, AnimalsAdapter.AnimalsViewHolder>(I
         fun bind(item: UIAnimal) {
             binding.name.text = item.name
             binding.photo.setImage(item.photo)
+
+            binding.root.setOnClickListener {
+                animalClickListener?.onAnimalClicked(item.id)
+            }
         }
+    }
+
+    fun setOnAnimalClickListener(animalClickListener: AnimalClickListener) {
+        this.animalClickListener = animalClickListener
     }
 }
 
@@ -77,4 +87,8 @@ private val ITEM_COMPARATOR = object : DiffUtil.ItemCallback<UIAnimal>() {
     override fun areContentsTheSame(oldItem: UIAnimal, newItem: UIAnimal): Boolean {
         return oldItem.name == newItem.name && oldItem.photo == newItem.photo
     }
+}
+
+fun interface AnimalClickListener {
+    fun onAnimalClicked(animalId: Long)
 }

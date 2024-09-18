@@ -46,8 +46,12 @@ class RoomCache @Inject constructor(
     private val organizationsDao: OrganizationsDao,
 ) : Cache {
 
-    override fun storeOrganizations(organizations: List<CachedOrganization>) {
+    override suspend fun storeOrganizations(organizations: List<CachedOrganization>) {
         organizationsDao.insert(organizations)
+    }
+
+    override suspend fun getOrganization(organizationId: String): CachedOrganization {
+        return organizationsDao.getOrganization(organizationId)
     }
 
     override fun getNearbyAnimals(): Flowable<List<CachedAnimalAggregate>> {
@@ -56,6 +60,10 @@ class RoomCache @Inject constructor(
 
     override suspend fun storeNearbyAnimals(animals: List<CachedAnimalAggregate>) {
         animalsDao.insertAnimalsWithDetails(animals)
+    }
+
+    override suspend fun getAnimal(animalId: Long): CachedAnimalAggregate {
+        return animalsDao.getAnimal(animalId)
     }
 
     override suspend fun getAllTypes(): List<String> {

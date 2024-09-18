@@ -73,6 +73,13 @@ class PetFinderAnimalRepository @Inject constructor(
         cache.storeNearbyAnimals(animals.map { CachedAnimalAggregate.fromDomain(it) })
     }
 
+    override suspend fun getAnimal(animalId: Long): AnimalWithDetails {
+        val (animal, photos, videos, tags) = cache.getAnimal(animalId)
+        val organization = cache.getOrganization(animal.organizationId)
+
+        return animal.toDomain(photos, videos, tags, organization)
+    }
+
     override suspend fun getAnimalTypes(): List<String> {
         return cache.getAllTypes()
     }

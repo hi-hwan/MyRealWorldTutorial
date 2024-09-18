@@ -48,4 +48,6 @@ data class Details(
     val healthDetails: HealthDetails,
     val habitatAdaptation: HabitatAdaptation,
     val organization: Organization
-)
+) {
+    val organizationContact: Organization.Contact = organization.contact
+}

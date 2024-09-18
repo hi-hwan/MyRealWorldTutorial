@@ -1,4 +1,4 @@
-package com.realworld.android.petsave.animalsnearyou.presentation
+package com.realworld.android.petsave.animalsnearyou.presentation.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,6 +8,7 @@ import com.realworld.android.petsave.animalsnearyou.domain.usecases.RequestNextP
 import com.realworld.android.petsave.common.domain.model.NetworkException
 import com.realworld.android.petsave.common.domain.model.NetworkUnavailableException
 import com.realworld.android.petsave.common.domain.model.NoMoreAnimalsException
+import com.realworld.android.petsave.common.domain.model.animal.Animal
 import com.realworld.android.petsave.common.domain.model.pagination.Pagination
 import com.realworld.android.petsave.common.presentation.Event
 import com.realworld.android.petsave.common.presentation.model.UIAnimal
@@ -20,7 +21,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -68,6 +68,7 @@ class AnimalsNearYouFragmentViewModel @Inject constructor(
 
     private fun subscribeToAnimalUpdates() {
         getAnimals()
+            .doOnNext { if (hasNoAnimalsStoredButCanLoadMore(it)) loadNextAnimalPage() }
             .map { animals -> animals.map { uiAnimalMapper.mapToView(it) } }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -76,6 +77,10 @@ class AnimalsNearYouFragmentViewModel @Inject constructor(
                 { onFailure(it) }
             )
             .addTo(compositeDisposable)
+    }
+
+    private fun hasNoAnimalsStoredButCanLoadMore(animals: List<Animal>): Boolean {
+        return animals.isEmpty() && !state.value.noMoreAnimalsNearby
     }
 
     private fun onNewAnimalList(animals: List<UIAnimal>) {

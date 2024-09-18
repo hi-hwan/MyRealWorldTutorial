@@ -64,9 +64,7 @@ class MainActivity : AppCompatActivity() {
     private val viewModel by viewModels<MainActivityViewModel>()
 
     private val navController by lazy {
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        navHostFragment.navController
+        (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment).navController
     }
     private val appBarConfiguration by lazy {
         AppBarConfiguration(
@@ -104,15 +102,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupBottomNav() {
         binding.bottomNavigation.setupWithNavController(navController)
-        hideBottomNavWhenInOnboarding()
+        hideBottomNavWhenNeeded()
     }
 
-    private fun hideBottomNavWhenInOnboarding() {
+    private fun hideBottomNavWhenNeeded() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id == onboardingR.id.onboardingFragment) {
-                binding.bottomNavigation.visibility = View.GONE
-            } else {
-                binding.bottomNavigation.visibility = View.VISIBLE
+            when (destination.id) {
+                onboardingR.id.onboardingFragment -> binding.bottomNavigation.visibility = View.GONE
+                else -> binding.bottomNavigation.visibility = View.VISIBLE
             }
         }
     }

@@ -74,7 +74,6 @@ dependencies {
 
     // Utils
     coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar_jdk_libs_version"
-    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakcanary_version"
 
     // Testing Dependencies
     testImplementation "junit:junit:$junit_version"

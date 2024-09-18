@@ -1,4 +1,4 @@
-package com.realworld.android.petsave.animalsnearyou.presentation
+package com.realworld.android.petsave.animalsnearyou.presentation.main
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -59,7 +60,14 @@ class AnimalsNearYouFragment : Fragment() {
         subscribeToViewStateUpdates(adapter)
     }
 
-    private fun createAdapter(): AnimalsAdapter = AnimalsAdapter()
+    private fun createAdapter(): AnimalsAdapter {
+        return AnimalsAdapter().apply {
+            setOnAnimalClickListener { animalId ->
+                val action = AnimalsNearYouFragmentDirections.actionAnimalsNearYouToDetails(animalId)
+                findNavController().navigate(action)
+            }
+        }
+    }
 
     private fun setupRecyclerView(animalsNearYouAdapter: AnimalsAdapter) {
         binding.animalsRecyclerView.apply {

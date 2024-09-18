@@ -20,6 +20,8 @@ interface AnimalRepository {
     fun getAnimals(): Flowable<List<Animal>>
     suspend fun requestMoreAnimals(pageToLoad: Int, numberOfItems: Int): PaginatedAnimals
     suspend fun storeAnimals(animals: List<AnimalWithDetails>)
+    suspend fun getAnimal(animalId: Long): AnimalWithDetails
+
     suspend fun getAnimalTypes(): List<String>
     fun getAnimalAges(): List<Age>
     fun searchCachedAnimalsBy(searchParameters: SearchParameters): Flowable<SearchResults>

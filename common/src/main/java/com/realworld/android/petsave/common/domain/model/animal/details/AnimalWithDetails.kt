@@ -2,6 +2,7 @@ package com.realworld.android.petsave.common.domain.model.animal.details
 
 import com.realworld.android.petsave.common.domain.model.animal.AdoptionStatus
 import com.realworld.android.petsave.common.domain.model.animal.Media
+import com.realworld.android.petsave.common.domain.model.organization.Organization
 import java.time.LocalDateTime
 
 /**
@@ -16,4 +17,7 @@ data class AnimalWithDetails(
     val tags: List<String>,
     val adoptionStatus: AdoptionStatus,
     val publishedAt: LocalDateTime
-)
+) {
+    val description: String = details.description
+    val organizationContact: Organization.Contact = details.organizationContact
+}

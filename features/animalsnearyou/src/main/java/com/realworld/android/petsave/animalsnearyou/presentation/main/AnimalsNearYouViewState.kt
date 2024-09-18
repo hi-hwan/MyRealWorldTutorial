@@ -1,4 +1,4 @@
-package com.realworld.android.petsave.animalsnearyou.presentation
+package com.realworld.android.petsave.animalsnearyou.presentation.main
 
 import com.realworld.android.petsave.common.presentation.Event
 import com.realworld.android.petsave.common.presentation.model.UIAnimal

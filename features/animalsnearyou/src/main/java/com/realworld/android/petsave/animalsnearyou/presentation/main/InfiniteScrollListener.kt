@@ -32,7 +32,7 @@
  * THE SOFTWARE.
  */
 
-package com.realworld.android.petsave.animalsnearyou.presentation
+package com.realworld.android.petsave.animalsnearyou.presentation.main
 
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView

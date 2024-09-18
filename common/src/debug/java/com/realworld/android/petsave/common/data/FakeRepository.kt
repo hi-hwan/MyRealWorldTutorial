@@ -161,6 +161,10 @@ class FakeRepository @Inject constructor() : AnimalRepository {
         mutableLocalAnimals.addAll(animals)
     }
 
+    override suspend fun getAnimal(animalId: Long): AnimalWithDetails {
+        return mutableLocalAnimals.find { it.id == animalId }!!
+    }
+
     override suspend fun getAnimalTypes(): List<String> {
         return listOf("dog")
     }

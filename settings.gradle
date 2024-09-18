@@ -15,6 +15,7 @@ dependencyResolutionManagement {
 
 include ':logging'
 include ':app'
+include ':features:sharing'
 include ':features:animalsnearyou'
 include ':features:search'
 include ':features:onboarding'

@@ -34,12 +34,12 @@
 
 package com.realworld.android.petsave
 
-import android.app.Application
+import com.google.android.play.core.splitcompat.SplitCompatApplication
 import com.realworld.android.logging.Logger
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class PetSaveApplication : Application() {
+class PetSaveApplication : SplitCompatApplication() {
 
     // initiate analytics, crashlytics, etc
 

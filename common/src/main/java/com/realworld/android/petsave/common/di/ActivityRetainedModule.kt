@@ -34,6 +34,7 @@
 
 package com.realworld.android.petsave.common.di
 
+import com.realworld.android.petsave.common.data.FakeRepository
 import com.realworld.android.petsave.common.data.PetFinderAnimalRepository
 import com.realworld.android.petsave.common.domain.repositories.AnimalRepository
 import com.realworld.android.petsave.common.utils.CoroutineDispatchersProvider
@@ -52,7 +53,7 @@ abstract class ActivityRetainedModule {
 
     @Binds
     @ActivityRetainedScoped
-    abstract fun bindAnimalRepository(repository: PetFinderAnimalRepository): AnimalRepository
+    abstract fun bindAnimalRepository(repository: FakeRepository): AnimalRepository
 
     @Binds
     abstract fun bindDispatchersProvider(dispatchersProvider: CoroutineDispatchersProvider):

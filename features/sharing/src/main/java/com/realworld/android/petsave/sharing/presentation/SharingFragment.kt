@@ -11,11 +11,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.snackbar.Snackbar
 import com.realworld.android.petsave.common.utils.setImage
+import com.realworld.android.petsave.main.di.SharingModuleDependencies
 import com.realworld.android.petsave.sharing.databinding.FragmentSharingBinding
-import dagger.hilt.android.AndroidEntryPoint
+import com.realworld.android.petsave.sharing.presentation.di.DaggerSharingComponent
+import com.realworld.android.petsave.sharing.presentation.di.ViewModelFactory
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-@AndroidEntryPoint
 class SharingFragment : Fragment() {
 
     companion object {
@@ -25,7 +28,24 @@ class SharingFragment : Fragment() {
     private val binding get() = _binding!!
     private var _binding: FragmentSharingBinding? = null
 
-    private val viewModel by viewModels<SharingFragmentViewModel>()
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    private val viewModel by viewModels<SharingFragmentViewModel> { viewModelFactory }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        DaggerSharingComponent.builder()
+            .context(requireActivity())
+            .moduleDependencies(
+                EntryPointAccessors.fromApplication(
+                    requireActivity().applicationContext,
+                    SharingModuleDependencies::class.java
+                )
+            )
+            .build()
+            .inject(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

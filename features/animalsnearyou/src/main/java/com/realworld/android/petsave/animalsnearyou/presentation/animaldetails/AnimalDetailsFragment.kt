@@ -7,7 +7,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.net.toUri
+import androidx.annotation.RawRes
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
@@ -16,7 +16,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.realworld.android.petsave.animalsnearyou.R
@@ -118,6 +117,7 @@ class AnimalDetailsFragment : Fragment() {
 
     private fun displayPetDetails(animalDetails: UIAnimalDetailed) {
         binding.group.isVisible = true
+        stopAnimation()
         binding.name.text = animalDetails.name
         binding.description.text = animalDetails.description
         binding.image.setImage(animalDetails.photo)
@@ -126,12 +126,29 @@ class AnimalDetailsFragment : Fragment() {
     }
 
     private fun displayError() {
+        startAnimation(R.raw.lazy_cat)
         binding.group.isVisible = false
         Snackbar.make(requireView(), commonR.string.an_error_occurred, Snackbar.LENGTH_SHORT).show()
     }
 
     private fun displayLoading() {
+        startAnimation(R.raw.happy_dog)
         binding.group.isVisible = false
+    }
+
+    private fun startAnimation(@RawRes animationRes: Int) {
+        binding.loader.apply {
+            isVisible = true
+            setAnimation(animationRes)
+            playAnimation()
+        }
+    }
+
+    private fun stopAnimation() {
+        binding.loader.apply {
+            cancelAnimation()
+            isVisible = false
+        }
     }
 
     override fun onDestroyView() {

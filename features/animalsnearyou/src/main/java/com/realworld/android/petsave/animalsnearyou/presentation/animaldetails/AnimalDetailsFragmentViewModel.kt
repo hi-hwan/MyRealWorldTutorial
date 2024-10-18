@@ -6,6 +6,7 @@ import com.realworld.android.petsave.animalsnearyou.presentation.animaldetails.m
 import com.realworld.android.petsave.common.domain.model.animal.details.AnimalWithDetails
 import com.realworld.android.petsave.common.domain.usecases.GetAnimalDetails
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -34,7 +35,7 @@ class AnimalDetailsFragmentViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val animal = getAnimalDetails(animalId)
-
+                delay(1000)
                 onAnimalsDetails(animal)
             } catch (t: Throwable) {
                 onFailure(t)

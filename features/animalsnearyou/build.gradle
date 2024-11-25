@@ -8,6 +8,8 @@ android {
 dependencies {
     implementation project(":common")
 
+    implementation "androidx.dynamicanimation:dynamicanimation:1.0.0"
+
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"

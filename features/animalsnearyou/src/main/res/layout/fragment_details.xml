@@ -18,6 +18,18 @@
             app:layout_constraintDimensionRatio="H,10:8"
             app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        app:srcCompat="@drawable/heart_fill_animation"
+        android:id="@+id/heart_image"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:contentDescription="@string/image_of_pet"
+        app:layout_constraintDimensionRatio="H,10:8"
+        app:layout_constraintTop_toTopOf="@id/image"
+        app:layout_constraintBottom_toBottomOf="@id/image"
+        app:layout_constraintStart_toStartOf="@id/image"
+        app:layout_constraintEnd_toEndOf="@id/image" />
+
     <TextView
             android:id="@+id/name"
             android:layout_width="wrap_content"

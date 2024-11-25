@@ -119,7 +119,8 @@ class AnimalsNearYouFragment : Fragment() {
     }
 
     private fun handleNoMoreAnimalsNearby(noMoreAnimalsNearby: Boolean) {
-
+        // Show a warning message and a prompt for the user to try a different
+        // distance or postcode
     }
 
     private fun handleFailures(failure: Event<Throwable>?) {

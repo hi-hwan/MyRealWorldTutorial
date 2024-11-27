@@ -13,7 +13,11 @@ import javax.inject.Inject
 
 class SearchAnimals @Inject constructor(
     private val animalRepository: AnimalRepository
-){
+) {
+    companion object {
+        private const val UI_EMPTY_VALUE = "Any"
+    }
+
     operator fun invoke(
         querySubject: BehaviorSubject<String>,
         ageSubject: BehaviorSubject<String>,
@@ -22,24 +26,24 @@ class SearchAnimals @Inject constructor(
         val query = querySubject
             .debounce(500L, TimeUnit.MILLISECONDS)
             .map { it.trim() }
-            .filter { it.length >= 2}
+            .filter { it.length >= 2 || it.isEmpty() }
+            .distinctUntilChanged()
 
         val age = ageSubject.replaceUIEmptyValue()
         val type = typeSubject.replaceUIEmptyValue()
 
         return Observable.combineLatest(query, age, type, combiningFunction)
             .toFlowable(BackpressureStrategy.LATEST)
-            .switchMap { parameter: SearchParameters ->
-                animalRepository.searchCachedAnimalsBy(parameter)
+            .filter { it.name.isNotEmpty() }
+            .switchMap { parameters: SearchParameters ->
+                animalRepository.searchCachedAnimalsBy(parameters)
             }
     }
 
     private val combiningFunction: Function3<String, String, String, SearchParameters>
-        get() = Function3 { query, age, type ->
-            SearchParameters(query, age, type)
-        }
+        get() = Function3 { query, age, type -> SearchParameters(query, age, type) }
 
-    private fun BehaviorSubject<String>.replaceUIEmptyValue() = map {
-        if (it == GetSearchFilters.NO_FILTER_SELECTED) "" else it
+    private fun BehaviorSubject<String>.replaceUIEmptyValue(): Observable<String> {
+        return map { if (it == UI_EMPTY_VALUE) "" else it }
     }
 }

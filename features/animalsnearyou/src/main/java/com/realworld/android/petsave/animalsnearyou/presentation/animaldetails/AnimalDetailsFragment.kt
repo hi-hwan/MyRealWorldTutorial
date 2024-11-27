@@ -39,6 +39,7 @@ import com.realworld.android.petsave.animalsnearyou.R
 import com.realworld.android.petsave.animalsnearyou.databinding.FragmentDetailsBinding
 import com.realworld.android.petsave.animalsnearyou.presentation.animaldetails.model.UIAnimalDetailed
 import com.realworld.android.petsave.common.utils.setImage
+import com.realworld.android.petsave.common.utils.toEmoji
 import com.realworld.android.petsave.common.utils.toEnglish
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -170,13 +171,18 @@ class AnimalDetailsFragment : Fragment() {
     }
 
     private fun displayPetDetails(animalDetails: UIAnimalDetailed) {
-        binding.group.isVisible = true
+        binding.call.scaleX = 0.6f
+        binding.call.scaleY = 0.6f
+        binding.call.isVisible = true
+        binding.scrollView.isVisible = true
         stopAnimation()
         binding.name.text = animalDetails.name
         binding.description.text = animalDetails.description
         binding.image.setImage(animalDetails.photo)
-        binding.sprayedNeutered.text = animalDetails.sprayNeutered.toEnglish()
-        binding.specialNeeds.text = animalDetails.specialNeeds.toEnglish()
+        binding.sprayedNeutered.text = animalDetails.sprayNeutered.toEmoji()
+        binding.specialNeeds.text = animalDetails.specialNeeds.toEmoji()
+        binding.declawed.text = animalDetails.declawed.toEmoji()
+        binding.shotsCurrent.text = animalDetails.shotsCurrent.toEmoji()
 
         val doubleTapGestureListener = object: GestureDetector.SimpleOnGestureListener() {
             override fun onDoubleTap(e: MotionEvent): Boolean {
@@ -231,13 +237,13 @@ class AnimalDetailsFragment : Fragment() {
 
     private fun displayError() {
         startAnimation(R.raw.lazy_cat)
-        binding.group.isVisible = false
+        binding.scrollView.isVisible = false
         Snackbar.make(requireView(), commonR.string.an_error_occurred, Snackbar.LENGTH_SHORT).show()
     }
 
     private fun displayLoading() {
         startAnimation(R.raw.happy_dog)
-        binding.group.isVisible = false
+        binding.scrollView.isVisible = false
     }
 
     private fun startAnimation(@RawRes animationRes: Int) {

@@ -41,7 +41,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.realworld.android.petsave.common.databinding.RecyclerViewAnimalItemBinding
 import com.realworld.android.petsave.common.presentation.model.UIAnimal
-import com.realworld.android.petsave.common.utils.setImage
+import com.realworld.android.petsave.common.utils.setImageWithCrossFade
 
 class AnimalsAdapter : ListAdapter<UIAnimal, AnimalsAdapter.AnimalsViewHolder>(ITEM_COMPARATOR) {
 
@@ -66,7 +66,7 @@ class AnimalsAdapter : ListAdapter<UIAnimal, AnimalsAdapter.AnimalsViewHolder>(I
 
         fun bind(item: UIAnimal) {
             binding.name.text = item.name
-            binding.photo.setImage(item.photo)
+            binding.photo.setImageWithCrossFade(item.photo)
 
             binding.root.setOnClickListener {
                 animalClickListener?.onAnimalClicked(item.id)

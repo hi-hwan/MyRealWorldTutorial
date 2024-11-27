@@ -48,6 +48,13 @@ fun ImageView.setImage(url: String) {
     Glide.with(this.context)
         .load(url.ifEmpty { null })
         .error(R.drawable.dog_placeholder)
+        .into(this)
+}
+
+fun ImageView.setImageWithCrossFade(url: String) {
+    Glide.with(this.context)
+        .load(url.ifEmpty { null })
+        .error(R.drawable.dog_placeholder)
         .centerCrop()
         .transition(DrawableTransitionOptions.withCrossFade())
         .into(this)
@@ -71,3 +78,16 @@ inline fun CoroutineScope.createExceptionHandler(
 }
 
 fun Boolean.toEnglish() = if (this) "Yes" else "No"
+
+const val CHECK_EMOJI = 0x2714
+const val CROSS_EMOJI = 0x274C
+const val QUESTION_EMOJI = 0x2753
+
+/**
+ * Equivalent to toEnglish() but returns emoji unicode instead
+ */
+fun Boolean?.toEmoji() = if (this != null) {
+    String(Character.toChars(if (this) CHECK_EMOJI else CROSS_EMOJI))
+} else {
+    String(Character.toChars(QUESTION_EMOJI))
+}

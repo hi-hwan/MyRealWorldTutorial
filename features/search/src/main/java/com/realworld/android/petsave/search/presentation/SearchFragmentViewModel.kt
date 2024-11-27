@@ -37,14 +37,14 @@ class SearchFragmentViewModel @Inject constructor(
     private val compositeDisposable: CompositeDisposable
 ) : ViewModel() {
 
-    private var currentPage = 0
-
     private val _state = MutableStateFlow(SearchViewState())
     private val querySubject = BehaviorSubject.create<String>()
     private val ageSubject = BehaviorSubject.createDefault("")
     private val typeSubject = BehaviorSubject.createDefault("")
 
-    private var remoteSearchJob: Job = Job()
+    private var runningJobs = mutableListOf<Job>()
+    private var isLastPage = false
+    private var currentPage = 0
 
     val state: StateFlow<SearchViewState> = _state.asStateFlow()
 
@@ -56,15 +56,21 @@ class SearchFragmentViewModel @Inject constructor(
     }
 
     private fun onSearchParametersUpdate(event: SearchEvent) {
-        remoteSearchJob.cancel(
-            CancellationException("New search parameters incoming!")
-        )
+        runningJobs.map { it.cancel() }
+
+        resetStateIfNoRemoteResults()
 
         when (event) {
             is SearchEvent.QueryInput -> updateQuery(event.input)
             is SearchEvent.AgeValueSelected -> updateAgeValue(event.age)
             is SearchEvent.TypeValueSelected -> updateTypeValue(event.type)
             else -> Logger.d("Wrong SearchEvent in onSearchParametersUpdates!")
+        }
+    }
+
+    private fun resetStateIfNoRemoteResults() {
+        if (state.value.isInNoSearchResultsState()) {
+            _state.value = state.value.updateToSearching()
         }
     }
 
@@ -103,7 +109,7 @@ class SearchFragmentViewModel @Inject constructor(
     private fun searchRemotely(searchParameters: SearchParameters) {
         val exceptionHandler = createExceptionHandler(message = "Failed to search remotely.")
 
-        remoteSearchJob = viewModelScope.launch(exceptionHandler) {
+        val job = viewModelScope.launch(exceptionHandler) {
             Logger.d("Searching remotely...")
             val pagination = searchAnimalsRemotely(
                 ++currentPage,
@@ -111,6 +117,12 @@ class SearchFragmentViewModel @Inject constructor(
             )
 
             onPaginationInfoObtained(pagination)
+        }
+        runningJobs.add(job)
+
+        job.invokeOnCompletion {
+            it?.printStackTrace()
+            runningJobs.remove(job)
         }
     }
 

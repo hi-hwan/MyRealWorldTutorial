@@ -59,4 +59,8 @@ data class SearchViewState(
     fun updateToHasFailure(throwable: Throwable): SearchViewState {
         return copy(failure = Event(throwable))
     }
+
+    fun isInNoSearchResultsState(): Boolean {
+        return noRemoteResults
+    }
 }

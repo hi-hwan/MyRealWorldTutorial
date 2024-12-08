@@ -233,6 +233,10 @@ class AnimalDetailsFragment : Fragment() {
                 findNavController().navigate(request)
             }
         }
+
+        binding.adoptButton.setOnClickListener {
+            binding.adoptButton.startLoading()
+        }
     }
 
     private fun displayError() {

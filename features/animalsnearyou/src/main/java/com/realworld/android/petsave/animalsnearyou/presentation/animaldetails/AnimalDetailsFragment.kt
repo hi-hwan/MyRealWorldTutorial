@@ -162,7 +162,7 @@ class AnimalDetailsFragment : Fragment() {
                         }
 
                         is AnimalDetailsViewState.AnimalDetails -> {
-                            displayPetDetails(state.animal)
+                            displayPetDetails(state.animal, state.adopted)
                         }
                     }
                 }
@@ -170,7 +170,7 @@ class AnimalDetailsFragment : Fragment() {
         }
     }
 
-    private fun displayPetDetails(animalDetails: UIAnimalDetailed) {
+    private fun displayPetDetails(animalDetails: UIAnimalDetailed, adopted: Boolean) {
         binding.call.scaleX = 0.6f
         binding.call.scaleY = 0.6f
         binding.call.isVisible = true

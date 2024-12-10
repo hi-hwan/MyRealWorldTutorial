@@ -58,12 +58,15 @@ class ProgressButton @JvmOverloads constructor(
 
     private var rotationAnimator: ValueAnimator? = null
 
+    private var drawCheck = false
+
     init {
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.ProgressButton)
         buttonText = typedArray.getString(R.styleable.ProgressButton_progressButton_text) ?: ""
         typedArray.recycle()
     }
 
+    // onDraw는 자주 호출되므로 성능 향상을 위해 onDraw 안에서 객체 생성하는 것을 피하자
     override fun onDraw(canvas: Canvas) { // 그리는 작업이 이루어지는 곳
         super.onDraw(canvas)
 
@@ -94,6 +97,24 @@ class ProgressButton @JvmOverloads constructor(
             progressRect.bottom = measuredHeight / 2.0f + buttonRect.width() / 4
             canvas.drawArc(progressRect, startAngle, 140f, false, progressPaint)
         }
+
+        if (drawCheck) {
+            // Canvas의 상태를 저장
+            canvas.save()
+            // Canvas를 45도 회전시키고, 뷰의 중심을 기준점으로 설정
+            canvas.rotate(45f, measuredWidth / 2f, measuredHeight / 2f)
+
+            // L의 좌우 반전 모양을 그린다
+            val x1 = measuredWidth / 2f - buttonRect.width() / 8
+            val y1 = measuredHeight / 2f + buttonRect.width() / 4
+            val x2 = measuredWidth / 2f + buttonRect.width() / 8
+            val y2 = measuredHeight / 2f + buttonRect.width() / 4
+            val x3 = measuredWidth / 2f + buttonRect.width() / 8
+            val y3 = measuredHeight / 2f - buttonRect.width() / 4
+            canvas.drawLine(x1, y1, x2, y2, progressPaint) // 수평선
+            canvas.drawLine(x2, y2, x3, y3, progressPaint) // 수직선
+            canvas.restore() // 원래 방향으로 되돌린다.
+        }
     }
 
     fun startLoading() {
@@ -102,7 +123,7 @@ class ProgressButton @JvmOverloads constructor(
                 offset = (measuredWidth - measuredHeight) / 2f * it.animatedValue as Float
                 invalidate() // Canvas에 뷰를 다시 그린다.
             }
-            addListener(object: AnimatorListenerAdapter() {
+            addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
                     super.onAnimationEnd(animation)
                     startProgressAnimation()
@@ -124,7 +145,7 @@ class ProgressButton @JvmOverloads constructor(
             duration = 600
             repeatCount = Animation.INFINITE
             interpolator = LinearInterpolator()
-            addListener(object: AnimatorListenerAdapter() {
+            addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
                     super.onAnimationEnd(animation)
                     loading = false
@@ -133,5 +154,20 @@ class ProgressButton @JvmOverloads constructor(
             })
         }
         rotationAnimator?.start()
+    }
+
+    fun done() {
+        loading = false
+        drawCheck = true
+        rotationAnimator?.cancel()
+        invalidate()
+    }
+
+    // 사용자가 애니메이션이 완료되기 전에 종료하면 애니메이션도 종료
+    // 그렇지 않으면 뷰가 파괴되었음에도 불구하고 애니메이션이 계속 실행되면서 메모리 누수가 발생
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        widthAnimator?.cancel()
+        rotationAnimator?.cancel()
     }
 }

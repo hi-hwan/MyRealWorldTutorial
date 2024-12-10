@@ -236,6 +236,12 @@ class AnimalDetailsFragment : Fragment() {
 
         binding.adoptButton.setOnClickListener {
             binding.adoptButton.startLoading()
+            viewModel.handleEvent(AnimalDetailsEvent.AdoptAnimal)
+        }
+
+        if (adopted) {
+            binding.adoptButton.done()
+            binding.adoptButton.setOnClickListener(null)
         }
     }
 

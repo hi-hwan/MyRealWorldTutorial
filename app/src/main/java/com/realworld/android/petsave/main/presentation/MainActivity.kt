@@ -35,9 +35,12 @@
 package com.realworld.android.petsave.main.presentation
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -49,6 +52,7 @@ import com.realworld.android.petsave.R
 import com.realworld.android.petsave.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import com.realworld.android.petsave.common.R as commonR
 import com.realworld.android.petsave.animalsnearyou.R as animalsNearYouR
 import com.realworld.android.petsave.onboarding.R as onboardingR
 import com.realworld.android.petsave.search.R as searchR
@@ -79,7 +83,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Switch to AppTheme for displaying the activity
-        setTheme(R.style.AppTheme)
+        setTheme(commonR.style.AppTheme)
 
         super.onCreate(savedInstanceState)
 
@@ -138,5 +142,27 @@ class MainActivity : AppCompatActivity() {
 
         navGraph.setStartDestination(startDestination)
         navController.graph = navGraph
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.theme_options, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val themeMode = when (item.itemId) {
+            R.id.light_theme -> {
+                AppCompatDelegate.MODE_NIGHT_NO
+            }
+            R.id.dark_theme -> {
+                AppCompatDelegate.MODE_NIGHT_YES
+            }
+            else -> {
+                AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            }
+        }
+        AppCompatDelegate.setDefaultNightMode(themeMode)
+        return true
     }
 }

@@ -2,5 +2,9 @@
 <resources>
     <declare-styleable name="ProgressButton">
         <attr name="progressButton_text" format="string" />
+        <attr name="progressButton_backgroundColor" format="color" />
+        <attr name="progressButton_textColor" format="color" />
+        <attr name="progressButton_progressColor" format="color" />
+        <attr name="progressButtonStyle" format="reference"/>
     </declare-styleable>
 </resources>

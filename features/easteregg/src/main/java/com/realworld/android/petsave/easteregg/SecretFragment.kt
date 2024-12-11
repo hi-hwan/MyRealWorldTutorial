@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.realworld.android.petsave.onboarding.databinding.FragmentSecretBinding
+import com.realworld.android.petsave.easteregg.databinding.FragmentSecretBinding
 
 class SecretFragment : Fragment() {
     private val binding get() = _binding!!

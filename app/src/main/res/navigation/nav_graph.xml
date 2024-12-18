@@ -8,6 +8,7 @@
     <include app:graph="@navigation/nav_animalsnearyou" />
     <include app:graph="@navigation/nav_search" />
     <include app:graph="@navigation/nav_secret" />
+    <include app:graph="@navigation/nav_report" />
     <include-dynamic
         android:id="@id/dynamicFeatureSharing"
         app:graphPackage="com.realworld.android.petsave.sharing"

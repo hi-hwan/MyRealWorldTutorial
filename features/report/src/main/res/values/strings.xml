@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="report">Report</string>
+    <string name="report_screen_label">Report a concern</string>
+    <string name="category">Category</string>
+    <string name="email">Email</string>
+    <string name="login">Login</string>
+    <string name="report_details">Report Details</string>
+    <string name="send_report">Send Report</string>
+    <string name="signup">Sign up</string>
+    <string name="upload_photo">Upload Photo</string>
+    <string name="permissionsLabel">Report Details Permission</string>
+    <string name="permissionDetail">Access the report details</string>
+</resources>

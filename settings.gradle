@@ -20,6 +20,7 @@ include ':features:animalsnearyou'
 include ':features:search'
 include ':features:onboarding'
 include ':features:easteregg'
+include ':features:report'
 include ':common'
 
 rootProject.name = 'PetSave'

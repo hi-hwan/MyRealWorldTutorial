@@ -11,4 +11,9 @@
         android:icon="@drawable/ic_search_24dp"
         android:title="@string/search"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@id/nav_report"
+        android:icon="@drawable/ic_animals_near_you_24dp"
+        android:title="@string/report"
+        app:showAsAction="ifRoom" />
 </menu>

@@ -1,0 +1,19 @@
+apply from: "$rootProject.projectDir/android-library.gradle"
+
+android {
+    namespace 'com.realworld.android.petsave.report'
+
+    sourceSets {
+        androidTest {
+            java.srcDirs += [
+                    "${project(':common').projectDir}/src/androidTest/java"
+            ]
+        }
+    }
+}
+
+dependencies {
+    implementation project(":common")
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.8.5'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.8.5'
+}

@@ -52,6 +52,7 @@ dependencies {
     implementation project(":features:search")
     implementation project(":features:onboarding")
     implementation project(":features:easteregg")
+    implementation project(":features:report")
     api project(":common")
     api project(":logging")
 

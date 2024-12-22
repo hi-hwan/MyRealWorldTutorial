@@ -6,7 +6,9 @@ import com.realworld.android.petsave.common.utils.createExceptionHandler
 import com.realworld.android.petsave.main.domain.usecases.OnboardingIsComplete
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.realworld.android.petsave.animalsnearyou.R as animalsNearYouR
@@ -17,9 +19,15 @@ class MainActivityViewModel @Inject constructor(
     private val onboardingIsComplete: OnboardingIsComplete
 ) : ViewModel() {
 
+    private val _viewEffect = MutableSharedFlow<MainActivityViewEffect>()
     val viewEffect: SharedFlow<MainActivityViewEffect> get() = _viewEffect
 
-    private val _viewEffect = MutableSharedFlow<MainActivityViewEffect>()
+    private val _isLoggedIn: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isLoggedIn get() = _isLoggedIn.asStateFlow()
+
+    fun setIsLoggedIn(loggedIn: Boolean) {
+        _isLoggedIn.value = loggedIn
+    }
 
     fun onEvent(event: MainActivityEvent) {
         when (event) {

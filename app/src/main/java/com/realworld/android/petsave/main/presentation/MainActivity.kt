@@ -39,6 +39,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -50,12 +51,22 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
 import com.realworld.android.petsave.R
+import com.realworld.android.petsave.common.data.preferences.PetSavePreferences
+import com.realworld.android.petsave.common.data.preferences.Preferences
+import com.realworld.android.petsave.common.domain.model.user.User
+import com.realworld.android.petsave.common.domain.repositories.UserRepository
+import com.realworld.android.petsave.common.utils.FileConstants
+import com.realworld.android.petsave.common.utils.PreferencesHelper
 import com.realworld.android.petsave.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import com.realworld.android.petsave.common.R as commonR
+import java.io.File
+import java.io.FileInputStream
+import java.io.ObjectInputStream
 import com.realworld.android.petsave.animalsnearyou.R as animalsNearYouR
+import com.realworld.android.petsave.common.R as commonR
 import com.realworld.android.petsave.onboarding.R as onboardingR
+import com.realworld.android.petsave.report.R as reportR
 import com.realworld.android.petsave.search.R as searchR
 
 /**
@@ -64,7 +75,8 @@ import com.realworld.android.petsave.search.R as searchR
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
+    private val binding get() = _binding!!
+    private var _binding: ActivityMainBinding? = null
 
     private val viewModel by viewModels<MainActivityViewModel>()
 
@@ -77,10 +89,13 @@ class MainActivity : AppCompatActivity() {
             topLevelDestinationIds = setOf(
                 onboardingR.id.onboardingFragment,
                 animalsNearYouR.id.animalsNearYouFragment,
-                searchR.id.searchFragment
+                searchR.id.searchFragment,
+                reportR.id.reportFragment
             )
         )
     }
+    private var isSignedUp = false
+    private var workingFile: File? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Switch to AppTheme for displaying the activity
@@ -92,12 +107,15 @@ class MainActivity : AppCompatActivity() {
             WindowManager.LayoutParams.FLAG_SECURE
         )
 
-        binding = ActivityMainBinding.inflate(layoutInflater)
+        _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setupActionBar()
         setupBottomNav()
-        triggerStartDestinationEvent()
+        setupWorkingFiles()
+        updateLoggedInState()
+
+        subscribeToLogin()
         subscribeToViewEffects()
     }
 
@@ -111,6 +129,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupBottomNav() {
+        binding.bottomNavigation.visibility = View.GONE
         binding.bottomNavigation.setupWithNavController(navController)
         hideBottomNavWhenNeeded()
     }
@@ -126,6 +145,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun triggerStartDestinationEvent() {
         viewModel.onEvent(MainActivityEvent.DefineStartDestination)
+    }
+
+    private fun subscribeToLogin() {
+        lifecycleScope.launch {
+            viewModel.isLoggedIn.collect { loggedIn ->
+                if (loggedIn) {
+                    triggerStartDestinationEvent()
+                }
+            }
+        }
     }
 
     private fun subscribeToViewEffects() {
@@ -160,14 +189,101 @@ class MainActivity : AppCompatActivity() {
             R.id.light_theme -> {
                 AppCompatDelegate.MODE_NIGHT_NO
             }
+
             R.id.dark_theme -> {
                 AppCompatDelegate.MODE_NIGHT_YES
             }
+
             else -> {
                 AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
             }
         }
         AppCompatDelegate.setDefaultNightMode(themeMode)
         return true
+    }
+
+
+    private fun setupWorkingFiles() {
+        workingFile = File(filesDir.absolutePath + File.separator +
+                FileConstants.DATA_SOURCE_FILE_NAME)
+    }
+
+    fun loginPressed(view: View) {
+        displayLogin(view, false)
+    }
+
+    private fun updateLoggedInState() {
+        val fileExists = workingFile?.exists() ?: false
+        if (fileExists) {
+            isSignedUp = true
+            binding.loginButton.text = getString(R.string.login)
+            binding.loginEmail.visibility = View.INVISIBLE
+        } else {
+            binding.loginButton.text = getString(R.string.signup)
+        }
+    }
+
+    private fun displayLogin(view: View, fallback: Boolean) {
+        //TODO: Replace below
+        performLoginOperation(view)
+    }
+
+    private fun performLoginOperation(view: View) {
+        var success = false
+        val preferences: Preferences = PetSavePreferences(this)
+
+        workingFile?.let {
+            //Check if already signed up
+            if (isSignedUp) {
+                val fileInputStream = FileInputStream(it)
+                val objectInputStream = ObjectInputStream(fileInputStream)
+                val list = objectInputStream.readObject() as ArrayList<User>
+                val firstUser = list.first() as? User
+                if (firstUser is User) { //2
+                    //TODO: Replace below with implementation that decrypts password
+                    success = true
+                }
+
+                if (success) {
+                    toast("Last login: ${PreferencesHelper.lastLoggedIn(this)}")
+                } else {
+                    toast("Please check your credentials and try again.")
+                }
+
+                objectInputStream.close()
+                fileInputStream.close()
+            } else {
+                //TODO: Replace with encrypted data source below
+                UserRepository.createDataSource(applicationContext, it, ByteArray(0))
+                success = true
+            }
+        }
+
+        if (success) {
+            PreferencesHelper.saveLastLoggedInTime(this)
+            viewModel.setIsLoggedIn(true)
+
+            //Show fragment
+            binding.loginEmail.visibility = View.GONE
+            binding.loginButton.visibility = View.GONE
+            val fragmentManager = supportFragmentManager
+            val fragment = fragmentManager.findFragmentById(R.id.nav_host_fragment)
+            fragment?.let{
+                fragmentManager.beginTransaction()
+                    .show(it)
+                    .commit()
+            }
+            fragmentManager.executePendingTransactions()
+            binding.bottomNavigation.visibility = View.VISIBLE
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+    }
+
+    private fun toast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }

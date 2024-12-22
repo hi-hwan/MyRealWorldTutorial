@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Pet Save</string>
     <string name="dynamic_feature_sharing_title">Share an animal</string>
+
+    <string name="email">Email</string>
+    <string name="login">Login</string>
+    <string name="signup">Sign up</string>
 </resources>

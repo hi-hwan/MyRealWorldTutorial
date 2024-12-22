@@ -19,10 +19,11 @@ import androidx.fragment.app.Fragment
 import com.realworld.android.petsave.report.databinding.FragmentReportDetailBinding
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
+import java.io.RandomAccessFile
+import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
-import javax.net.ssl.HttpsURLConnection
 
 @AndroidEntryPoint
 class ReportDetailFragment : Fragment() {
@@ -47,7 +48,9 @@ class ReportDetailFragment : Fragment() {
 
     private val selectImageFromGalleryResult =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            if (uri != null) showUploadedFile(uri)
+            if (uri != null) {
+                getFileName(uri)
+            }
         }
 
     @Volatile
@@ -79,6 +82,12 @@ class ReportDetailFragment : Fragment() {
         setupUI()
     }
 
+    override fun onPause() {
+        context?.cacheDir?.deleteRecursively()
+        context?.externalCacheDir?.deleteRecursively()
+        super.onPause()
+    }
+
     private fun setupUI() {
         binding.detailsEdtxtview.imeOptions = EditorInfo.IME_ACTION_DONE
         binding.detailsEdtxtview.setRawInputType(InputType.TYPE_CLASS_TEXT)
@@ -95,12 +104,14 @@ class ReportDetailFragment : Fragment() {
             val reportID = UUID.randomUUID().toString()
 
             context?.let { theContext ->
+                //TODO: Replace below for encrypting the file
                 val file = File(theContext.filesDir?.absolutePath, "$reportID.txt")
                 file.bufferedWriter().use {
                     it.write(reportString)
                 }
             }
-
+            //TODO: Test your custom encryption here
+            //testCustomEncryption(reportString)
             ReportTracker.reportNumber.incrementAndGet()
 
             //2. Send report
@@ -111,7 +122,7 @@ class ReportDetailFragment : Fragment() {
             )
             if (postParameters.isNotEmpty()) {
                 //send report
-                val connection = URL(API_URL).openConnection() as HttpsURLConnection
+                val connection = URL(API_URL).openConnection() as HttpURLConnection
                 //...
             }
 
@@ -131,6 +142,10 @@ class ReportDetailFragment : Fragment() {
         }
     }
 
+    private fun testCustomEncryption(reportString: String) {
+
+    }
+
     private fun uploadPhotoPressed() {
         context?.let {
             if (ContextCompat.checkSelfPermission(
@@ -147,28 +162,57 @@ class ReportDetailFragment : Fragment() {
 
     private fun selectImageFromGallery() = selectImageFromGalleryResult.launch("image/*")
 
-    private fun showUploadedFile(selectedImage: Uri) {
-        //get filename
-        val fileNameColumn = arrayOf(MediaStore.Images.Media.DISPLAY_NAME)
-        val nameCursor = activity?.contentResolver?.query(
-            selectedImage, fileNameColumn,
-            null, null, null
-        )
-        nameCursor?.moveToFirst()
-        val nameIndex = nameCursor?.getColumnIndex(fileNameColumn[0])
-        var filename = ""
-        nameIndex?.let {
-            filename = nameCursor.getString(it)
-        }
-        nameCursor?.close()
+    private fun getFileName(selectedImage: Uri) {
+        // Validate image
+        val isValid = isValidJPEGAtPath(selectedImage)
+        if (isValid) {
+            //get filename
+            val fileNameColumn = arrayOf(MediaStore.Images.Media.DISPLAY_NAME)
+            val nameCursor = activity?.contentResolver?.query(
+                selectedImage, fileNameColumn,
+                null, null, null
+            )
+            nameCursor?.moveToFirst()
+            val nameIndex = nameCursor?.getColumnIndex(fileNameColumn[0])
+            var filename = ""
+            nameIndex?.let {
+                filename = nameCursor.getString(it)
+            }
+            nameCursor?.close()
 
-        //update UI with filename
-        binding.uploadStatusTextview.text = filename
+            //update UI with filename
+            binding.uploadStatusTextview.text = filename
+        } else {
+            val toast = Toast.makeText(context, "Please choose a JPEG image", Toast.LENGTH_LONG)
+            toast.show()
+        }
     }
 
-    override fun onPause() {
-        context?.cacheDir?.deleteRecursively()
-        context?.externalCacheDir?.deleteRecursively()
-        super.onPause()
+    private fun isValidJPEGAtPath(selectedImage: Uri): Boolean {
+        var success = false
+        val file = File(context?.cacheDir, "temp.jpg")
+        val inputStream = activity?.contentResolver?.openInputStream(selectedImage)
+        val outputStream = activity?.contentResolver?.openOutputStream(Uri.fromFile(file))
+        outputStream?.let {
+            inputStream?.copyTo(it)
+
+            val randomAccessFile = RandomAccessFile(file, "r")
+            val length = randomAccessFile.length()
+            val lengthError = (length < 10L)
+            val start = ByteArray(2)
+            randomAccessFile.readFully(start)
+            randomAccessFile.seek(length - 2)
+            val end = ByteArray(2)
+            randomAccessFile.readFully(end)
+            success = !lengthError && start[0].toInt() == -1 && start[1].toInt() == -40 &&
+                    end[0].toInt() == -1 && end[1].toInt() == -39
+
+            randomAccessFile.close()
+            outputStream.close()
+        }
+        inputStream?.close()
+        file.delete()
+
+        return success
     }
 }

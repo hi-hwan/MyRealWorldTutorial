@@ -72,6 +72,10 @@ dependencies {
 
     implementation "com.google.android.material:material:$material_version"
 
+    // Security
+    implementation 'androidx.biometric:biometric:1.1.0'
+    implementation "androidx.security:security-crypto:$security_version"
+
     // Utils
     coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar_jdk_libs_version"
 

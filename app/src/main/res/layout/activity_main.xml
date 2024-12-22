@@ -15,6 +15,29 @@
         android:background="@color/colorPrimary"
         android:theme="@style/Theme.MaterialComponents.NoActionBar" />
 
+    <EditText
+        android:id="@+id/login_email"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:autofillHints="@string/email"
+        android:focusable="true"
+        android:hint="@string/email"
+        android:inputType="textEmailAddress"
+        android:maxLength="254"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:textColor="#7B869B"
+        android:textColorHint="#cccccc"
+        tools:targetApi="o" />
+
+    <Button
+        android:id="@+id/login_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="loginPressed"
+        android:text="@string/login" />
+
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
         android:name="androidx.navigation.dynamicfeatures.fragment.DynamicNavHostFragment"

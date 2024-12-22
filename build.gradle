@@ -26,6 +26,7 @@ buildscript {
         retrofit_version = "2.9.0"
         okHttp_version = '5.0.0-alpha.7'
         moshi_converter_version = '2.9.0'
+        xml_converter_version = '2.7.1'
         moshi_version = '1.13.0'
         glide_version = '4.13.2'
         material_version = "1.11.0"
@@ -36,6 +37,7 @@ buildscript {
         timber_version = '5.0.1'
         dagger_version = '2.50'
         lottie_version = '5.2.0'
+        security_version = "1.1.0-alpha03"
     }
 
     repositories {

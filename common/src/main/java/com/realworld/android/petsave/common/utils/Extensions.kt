@@ -40,6 +40,7 @@ import android.graphics.Rect
 import android.widget.ImageView
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.realworld.android.logging.Logger
 import com.realworld.android.petsave.common.R
@@ -51,6 +52,7 @@ fun ImageView.setImage(url: String) {
     Glide.with(this.context)
         .load(url.ifEmpty { null })
         .error(R.drawable.dog_placeholder)
+        .diskCacheStrategy(DiskCacheStrategy.NONE)
         .into(this)
 }
 
@@ -60,6 +62,7 @@ fun ImageView.setImageWithCrossFade(url: String) {
         .error(R.drawable.dog_placeholder)
         .centerCrop()
         .transition(DrawableTransitionOptions.withCrossFade())
+        .diskCacheStrategy(DiskCacheStrategy.NONE)
         .into(this)
 }
 

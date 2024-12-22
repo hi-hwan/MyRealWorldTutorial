@@ -76,6 +76,7 @@ object ApiModule {
             .addInterceptor(networkStatusInterceptor)
             .addInterceptor(authenticationInterceptor)
             .addInterceptor(httpLoggingInterceptor)
+            .cache(null)
             .build()
     }
 

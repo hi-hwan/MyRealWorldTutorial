@@ -1,6 +1,8 @@
 package com.realworld.android.petsave.report.presentation
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -12,6 +14,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.realworld.android.petsave.report.databinding.FragmentReportDetailBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -34,6 +37,13 @@ class ReportDetailFragment : Fragment() {
     object ReportTracker {
         var reportNumber = AtomicInteger()
     }
+
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            if (granted) {
+                selectImageFromGallery()
+            }
+        }
 
     private val selectImageFromGalleryResult =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -122,7 +132,17 @@ class ReportDetailFragment : Fragment() {
     }
 
     private fun uploadPhotoPressed() {
-        selectImageFromGallery()
+        context?.let {
+            if (ContextCompat.checkSelfPermission(
+                    it,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+            } else {
+                selectImageFromGallery()
+            }
+        }
     }
 
     private fun selectImageFromGallery() = selectImageFromGalleryResult.launch("image/*")
@@ -144,5 +164,11 @@ class ReportDetailFragment : Fragment() {
 
         //update UI with filename
         binding.uploadStatusTextview.text = filename
+    }
+
+    override fun onPause() {
+        context?.cacheDir?.deleteRecursively()
+        context?.externalCacheDir?.deleteRecursively()
+        super.onPause()
     }
 }

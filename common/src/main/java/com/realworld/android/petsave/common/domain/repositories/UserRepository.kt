@@ -20,11 +20,10 @@ class UserRepository {
                 null
             }
             users?.list?.let {
-                //1
                 val userList = ArrayList(it) as? ArrayList
-                if (userList is ArrayList<User>) { //2
-                    val firstUser = userList.first() as? User
-                    if (firstUser is User) { //3
+                if (userList is ArrayList<User>) {
+                    val firstUser = userList.first()
+                    if (firstUser is User) {
                         firstUser.password = Base64.encodeToString(password, Base64.NO_WRAP)
                         val fileOutputStream = FileOutputStream(outFile)
                         val objectOutputStream = ObjectOutputStream(fileOutputStream)

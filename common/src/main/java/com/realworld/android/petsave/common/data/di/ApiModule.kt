@@ -71,6 +71,11 @@ object ApiModule {
         networkStatusInterceptor: NetworkStatusInterceptor,
         authenticationInterceptor: AuthenticationInterceptor,
     ): OkHttpClient {
+
+        //TODO: Add pinning for versions lower than M
+
+        //TODO: Add certificate transparency here
+
         // Network -> Authentication -> Logging
         return OkHttpClient.Builder()
             .addInterceptor(networkStatusInterceptor)

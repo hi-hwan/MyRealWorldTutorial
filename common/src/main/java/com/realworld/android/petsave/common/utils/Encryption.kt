@@ -37,10 +37,13 @@ class Encryption {
                 .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
                 .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
                 .setUserAuthenticationRequired(true) // 잠금화면 설정하도록 요구
-                .setUserAuthenticationParameters(
-                    120,
-                    KeyProperties.AUTH_BIOMETRIC_STRONG or KeyProperties.AUTH_DEVICE_CREDENTIAL
-                ) // 인증 후 120초 동안 키를 사용할 수 있도록 설정
+                //For R+, can use  KeyProperties.AUTH_BIOMETRIC_STRONG and KeyProperties.AUTH_DEVICE_CREDENTIAL
+                //.setUserAuthenticationParameters(
+                //    120,
+                //    KeyProperties.AUTH_BIOMETRIC_STRONG or KeyProperties.AUTH_DEVICE_CREDENTIAL
+                //) // 인증 후 120초 동안 키를 사용할 수 있도록 설정
+                //Otherwise:
+                .setUserAuthenticationValidityDurationSeconds(120)
                 .build()
             val keyGenerator = KeyGenerator.getInstance(
                 KeyProperties.KEY_ALGORITHM_AES, PROVIDER
@@ -72,8 +75,16 @@ class Encryption {
         }
 
         fun encryptFile(context: Context, file: File): EncryptedFile {
+            val spec = KeyGenParameterSpec.Builder(
+                MasterKey.DEFAULT_MASTER_KEY_ALIAS,
+                KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
+                .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                .setKeySize(256)
+                .build()
+
             val masterKey = MasterKey.Builder(context)
-                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                .setKeyGenParameterSpec(spec)
                 .build()
             return EncryptedFile.Builder(
                 context,

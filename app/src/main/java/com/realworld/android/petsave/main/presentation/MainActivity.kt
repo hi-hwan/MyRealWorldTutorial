@@ -55,6 +55,8 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
 import com.realworld.android.petsave.R
+import com.realworld.android.petsave.common.data.api.Authenticator
+import com.realworld.android.petsave.common.data.api.ReportManager
 import com.realworld.android.petsave.common.data.preferences.PetSavePreferences
 import com.realworld.android.petsave.common.data.preferences.Preferences
 import com.realworld.android.petsave.common.domain.model.user.User
@@ -71,6 +73,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.ObjectInputStream
 import java.util.concurrent.Executors
+import javax.inject.Inject
 import com.realworld.android.petsave.animalsnearyou.R as animalsNearYouR
 import com.realworld.android.petsave.common.R as commonR
 import com.realworld.android.petsave.onboarding.R as onboardingR
@@ -107,6 +110,11 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
+
+    val clientAuthenticator = Authenticator()
+    var serverPublicKeyString = ""
+    @Inject
+    lateinit var reportManager: ReportManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Switch to AppTheme for displaying the activity
@@ -312,12 +320,17 @@ class MainActivity : AppCompatActivity() {
                 val list = objectInputStream.readObject() as ArrayList<User>
                 val firstUser = list.first() as? User
                 if (firstUser is User) { //2
-                    val password = decryptPassword(
+                    val userToken = decryptPassword(
                         this,
                         Base64.decode(firstUser.password, Base64.NO_WRAP)
                     )
-                    if (password.isNotEmpty()) {
-                        success = true
+                    if (userToken.isNotEmpty()) {
+                        //NOTE: Send credentials to authenticate with server
+                        serverPublicKeyString = reportManager.login(
+                            Base64.encodeToString(userToken, Base64.NO_WRAP),
+                            clientAuthenticator.publicKey()
+                        )
+                        success = serverPublicKeyString.isNotEmpty()
                     }
                 }
 

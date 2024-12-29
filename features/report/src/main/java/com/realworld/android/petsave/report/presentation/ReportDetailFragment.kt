@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.text.InputType
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +18,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.realworld.android.petsave.common.data.api.ReportManager
 import com.realworld.android.petsave.common.utils.Encryption
 import com.realworld.android.petsave.common.utils.Encryption.Companion.encryptFile
 import com.realworld.android.petsave.report.databinding.FragmentReportDetailBinding
@@ -25,19 +27,20 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.ObjectOutputStream
 import java.io.RandomAccessFile
-import java.net.HttpURLConnection
-import java.net.URL
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ReportDetailFragment : Fragment() {
 
+    @Inject
+    lateinit var reportManager: ReportManager
+
     companion object {
-        private const val API_URL = "https://example.com/?send_report"
-        private const val REPORT_APP_ID = 46341L
-        private const val REPORT_PROVIDER_ID = 46341L
-        private const val REPORT_SESSION_KEY = "session_key_in_next_chapter"
+        private const val PIC_FROM_GALLERY = 2
+        private const val REPORT_APP_ID = 46341
+        private const val REPORT_SESSION_KEY = "session_key_test"
     }
 
     object ReportTracker {
@@ -101,6 +104,7 @@ class ReportDetailFragment : Fragment() {
     private fun sendReportPressed() {
         if (!isSendingReport) {
             isSendingReport = true
+            var success = true
 
             //1. Save report
             var reportString = binding.categoryEdtxtview.text.toString()
@@ -115,22 +119,34 @@ class ReportDetailFragment : Fragment() {
                     it.write(reportString)
                 }
             }
-            testCustomEncryption(reportString)
+            // testCustomEncryption(reportString)
             ReportTracker.reportNumber.incrementAndGet()
 
             //2. Send report
+            val mainActivity = activity
+            var requestSignature = ""
             val postParameters = mapOf(
-                "application_id" to REPORT_APP_ID * REPORT_PROVIDER_ID,
+                "application_id" to REPORT_APP_ID,
                 "report_id" to reportID,
                 "report" to reportString
             )
             if (postParameters.isNotEmpty()) {
                 //send report
-                val connection = URL(API_URL).openConnection() as HttpURLConnection
-                //...
-            }
+                reportManager.sendReport(postParameters) {
+                    val reportSent: Boolean = it["success"] as Boolean
+                    if (reportSent) {
+                        //TODO: Verify signature here
+                        success = true
+                    } //end if (reportSent) {
+                    onReportReceived(success)
+                } //mainActivity.reportManager.sendReport(postParameters) {
+            } //end if (postParameters.isNotEmpty()) {
+        }
+    }
 
-            isSendingReport = false
+    private fun onReportReceived(success: Boolean) {
+        isSendingReport = false
+        if (success) {
             context?.let {
                 val report = "Report: ${ReportTracker.reportNumber.get()}"
                 val toast = Toast.makeText(
@@ -139,6 +155,14 @@ class ReportDetailFragment : Fragment() {
                 )
                 toast.show()
             }
+        } else {
+            val toast = Toast.makeText(
+                context,
+                "There was a problem sending the report.",
+                Toast.LENGTH_LONG
+            )
+            toast.setGravity(Gravity.TOP, 0, 0)
+            toast.show()
 
             val inputMethodManager = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as
                     InputMethodManager

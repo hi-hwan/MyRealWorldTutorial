@@ -10,13 +10,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.security.Security
 import java.util.UUID
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class ReportManager @Inject constructor(){
-
-    private val serverAuthenticator = Authenticator()
+class ReportManager(
+    private val serverAuthenticator: ServerAuthenticator
+) {
     private var clientPublicKeyString = ""
 
     init {
@@ -72,10 +69,9 @@ class ReportManager @Inject constructor(){
                     if (success) {
                         //Process data
                         val confirmationCode = UUID.randomUUID().toString()
-                        val bytesToSign = confirmationCode.toByteArray(Charsets.UTF_8) // 1
-                        val signedData = serverAuthenticator.sign(bytesToSign) // 2
-                        val requestSignature =
-                            Base64.encodeToString(signedData, Base64.NO_WRAP) // 3
+                        val bytesToSign = confirmationCode.toByteArray(Charsets.UTF_8)
+                        val signedData = serverAuthenticator.sign(bytesToSign)
+                        val requestSignature = Base64.encodeToString(signedData, Base64.NO_WRAP)
                         result = mapOf(
                             "success" to true,
                             "confirmation_code" to confirmationCode,
@@ -84,7 +80,7 @@ class ReportManager @Inject constructor(){
                     }
                 }
                 callback(result)
-            } //withContext(Main) {
-        } //GlobalScope.launch(Default) {
+            }
+        }
     }
 }

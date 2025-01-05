@@ -44,4 +44,5 @@ dependencies {
 
     // Security
     implementation "androidx.security:security-crypto:$security_version"
+    implementation "com.appmattus.certificatetransparency:certificatetransparency-android:$certificatetransparency_version"
 }

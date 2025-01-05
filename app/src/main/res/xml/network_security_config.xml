@@ -1,2 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<network-security-config/>
+<network-security-config>
+    <!-- 지정된 도메인에 대해 TLS를 사용하지 않는 네트워크 요청을 차단 -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">petfinder.com</domain>
+        <pin-set>
+            <pin digest="SHA-256">d64mTAGzLoXnGwQTGqE/SMJqc2On+QNsyzxj8kW9UPU=</pin>
+            <pin digest="SHA-256">vxRon/El5KuI4vx5ey1DgmsYmRY0nDd5Cg4GfJ8S+bg=</pin>
+        </pin-set>
+    </domain-config>
+</network-security-config>

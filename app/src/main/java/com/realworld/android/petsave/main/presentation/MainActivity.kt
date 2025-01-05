@@ -56,6 +56,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
 import com.realworld.android.petsave.R
 import com.realworld.android.petsave.common.data.api.Authenticator
+import com.realworld.android.petsave.common.data.api.ClientAuthenticator
 import com.realworld.android.petsave.common.data.api.ReportManager
 import com.realworld.android.petsave.common.data.preferences.PetSavePreferences
 import com.realworld.android.petsave.common.data.preferences.Preferences
@@ -111,8 +112,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
 
-    val clientAuthenticator = Authenticator()
-    var serverPublicKeyString = ""
+    @Inject
+    lateinit var clientAuthenticator: ClientAuthenticator
+
     @Inject
     lateinit var reportManager: ReportManager
 
@@ -326,11 +328,14 @@ class MainActivity : AppCompatActivity() {
                     )
                     if (userToken.isNotEmpty()) {
                         //NOTE: Send credentials to authenticate with server
-                        serverPublicKeyString = reportManager.login(
+                        val serverPublicKeyString = reportManager.login(
                             Base64.encodeToString(userToken, Base64.NO_WRAP),
                             clientAuthenticator.publicKey()
                         )
                         success = serverPublicKeyString.isNotEmpty()
+                        if (success) {
+                            clientAuthenticator.serverPublicKeyString = serverPublicKeyString
+                        }
                     }
                 }
 

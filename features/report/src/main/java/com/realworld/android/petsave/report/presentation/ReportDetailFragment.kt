@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.InputType
+import android.util.Base64
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -18,6 +19,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.realworld.android.petsave.common.data.api.ClientAuthenticator
 import com.realworld.android.petsave.common.data.api.ReportManager
 import com.realworld.android.petsave.common.utils.Encryption
 import com.realworld.android.petsave.common.utils.Encryption.Companion.encryptFile
@@ -36,6 +38,9 @@ class ReportDetailFragment : Fragment() {
 
     @Inject
     lateinit var reportManager: ReportManager
+
+    @Inject
+    lateinit var clientAuthenticator: ClientAuthenticator
 
     companion object {
         private const val PIC_FROM_GALLERY = 2
@@ -123,24 +128,37 @@ class ReportDetailFragment : Fragment() {
             ReportTracker.reportNumber.incrementAndGet()
 
             //2. Send report
-            val mainActivity = activity
-            var requestSignature = ""
+            val stringToSign = "$REPORT_APP_ID+$reportID+$reportString"
+            val bytesToSign = stringToSign.toByteArray(Charsets.UTF_8)
+            val signedData = clientAuthenticator.sign(bytesToSign)
+            val requestSignature = Base64.encodeToString(signedData, Base64.NO_WRAP)
             val postParameters = mapOf(
                 "application_id" to REPORT_APP_ID,
                 "report_id" to reportID,
-                "report" to reportString
+                "report" to reportString,
+                "signature" to requestSignature
             )
+
             if (postParameters.isNotEmpty()) {
                 //send report
                 reportManager.sendReport(postParameters) {
                     val reportSent: Boolean = it["success"] as Boolean
                     if (reportSent) {
-                        //TODO: Verify signature here
-                        success = true
-                    } //end if (reportSent) {
+                        val serverSignature = it["signature"] as String
+                        val signatureBytes = Base64.decode(serverSignature, Base64.NO_WRAP)
+
+                        val confirmationCode = it["confirmation_code"] as String
+                        val confirmationBytes = confirmationCode.toByteArray(Charsets.UTF_8)
+
+                        success = clientAuthenticator.verify(
+                            signatureBytes,
+                            confirmationBytes,
+                            clientAuthenticator.serverPublicKeyString
+                        )
+                    }
                     onReportReceived(success)
-                } //mainActivity.reportManager.sendReport(postParameters) {
-            } //end if (postParameters.isNotEmpty()) {
+                }
+            }
         }
     }
 

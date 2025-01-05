@@ -38,6 +38,7 @@ buildscript {
         dagger_version = '2.50'
         lottie_version = '5.2.0'
         security_version = "1.1.0-alpha03"
+        certificatetransparency_version = "1.1.1"
     }
 
     repositories {

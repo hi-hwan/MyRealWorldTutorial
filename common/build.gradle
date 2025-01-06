@@ -45,4 +45,5 @@ dependencies {
     // Security
     implementation "androidx.security:security-crypto:$security_version"
     implementation "com.appmattus.certificatetransparency:certificatetransparency-android:$certificatetransparency_version"
+    implementation 'com.google.firebase:firebase-messaging:23.0.6'
 }

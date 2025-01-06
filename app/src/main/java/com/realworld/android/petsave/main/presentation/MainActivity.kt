@@ -55,11 +55,8 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
 import com.realworld.android.petsave.R
-import com.realworld.android.petsave.common.data.api.Authenticator
 import com.realworld.android.petsave.common.data.api.ClientAuthenticator
 import com.realworld.android.petsave.common.data.api.ReportManager
-import com.realworld.android.petsave.common.data.preferences.PetSavePreferences
-import com.realworld.android.petsave.common.data.preferences.Preferences
 import com.realworld.android.petsave.common.domain.model.user.User
 import com.realworld.android.petsave.common.domain.repositories.UserRepository
 import com.realworld.android.petsave.common.utils.Encryption.Companion.createLoginPassword
@@ -67,6 +64,7 @@ import com.realworld.android.petsave.common.utils.Encryption.Companion.decryptPa
 import com.realworld.android.petsave.common.utils.Encryption.Companion.generateSecretKey
 import com.realworld.android.petsave.common.utils.FileConstants
 import com.realworld.android.petsave.common.utils.PreferencesHelper
+import com.realworld.android.petsave.common.utils.Timing
 import com.realworld.android.petsave.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -321,23 +319,14 @@ class MainActivity : AppCompatActivity() {
                 val objectInputStream = ObjectInputStream(fileInputStream)
                 val list = objectInputStream.readObject() as ArrayList<User>
                 val firstUser = list.first() as? User
-                if (firstUser is User) { //2
-                    val userToken = decryptPassword(
-                        this,
+                if (firstUser is User) {
+                    success = sendCredentialsToServer(
                         Base64.decode(firstUser.password, Base64.NO_WRAP)
                     )
-                    if (userToken.isNotEmpty()) {
-                        //NOTE: Send credentials to authenticate with server
-                        val serverPublicKeyString = reportManager.login(
-                            Base64.encodeToString(userToken, Base64.NO_WRAP),
-                            clientAuthenticator.publicKey()
-                        )
-                        success = serverPublicKeyString.isNotEmpty()
-                        if (success) {
-                            clientAuthenticator.serverPublicKeyString = serverPublicKeyString
-                        }
-                    }
                 }
+
+                // Prevent timing attack by adding random delay
+                Timing.doRandomWork()
 
                 if (success) {
                     toast("Last login: ${PreferencesHelper.lastLoggedIn(this)}")
@@ -350,7 +339,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 val encryptedInfo = createLoginPassword(this)
                 UserRepository.createDataSource(applicationContext, it, encryptedInfo)
-                success = true
+                success = sendCredentialsToServer(encryptedInfo)
             }
         }
 
@@ -371,6 +360,23 @@ class MainActivity : AppCompatActivity() {
             fragmentManager.executePendingTransactions()
             binding.bottomNavigation.visibility = View.VISIBLE
         }
+    }
+
+    private fun sendCredentialsToServer(token: ByteArray): Boolean {
+        var success = false
+        val userToken = decryptPassword(this, token)
+        if (userToken.isNotEmpty()) {
+            //NOTE: Send credentials to authenticate with server
+            val serverPublicKeyString = reportManager.login(
+                Base64.encodeToString(userToken, Base64.NO_WRAP),
+                clientAuthenticator.publicKey()
+            )
+            success = serverPublicKeyString.isNotEmpty()
+            if (success) {
+                clientAuthenticator.serverPublicKeyString = serverPublicKeyString
+            }
+        }
+        return success
     }
 
     override fun onDestroy() {

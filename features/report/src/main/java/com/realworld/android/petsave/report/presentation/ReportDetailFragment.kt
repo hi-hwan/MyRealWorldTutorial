@@ -43,8 +43,8 @@ class ReportDetailFragment : Fragment() {
     lateinit var clientAuthenticator: ClientAuthenticator
 
     companion object {
-        private const val PIC_FROM_GALLERY = 2
         private const val REPORT_APP_ID = 46341
+        private const val REPORT_PROVIDER_ID = 46341
         private const val REPORT_SESSION_KEY = "session_key_test"
     }
 
@@ -115,6 +115,8 @@ class ReportDetailFragment : Fragment() {
             var reportString = binding.categoryEdtxtview.text.toString()
             reportString += " : "
             reportString += binding.detailsEdtxtview.text.toString()
+            //TODO: Sanitize string here
+
             val reportID = UUID.randomUUID().toString()
 
             context?.let { theContext ->
@@ -128,12 +130,14 @@ class ReportDetailFragment : Fragment() {
             ReportTracker.reportNumber.incrementAndGet()
 
             //2. Send report
-            val stringToSign = "$REPORT_APP_ID+$reportID+$reportString"
+            //Add Signature
+            val id = REPORT_APP_ID * REPORT_PROVIDER_ID
+            val stringToSign = "$id+$reportID+$reportString"
             val bytesToSign = stringToSign.toByteArray(Charsets.UTF_8)
             val signedData = clientAuthenticator.sign(bytesToSign)
             val requestSignature = Base64.encodeToString(signedData, Base64.NO_WRAP)
             val postParameters = mapOf(
-                "application_id" to REPORT_APP_ID,
+                "application_id" to id,
                 "report_id" to reportID,
                 "report" to reportString,
                 "signature" to requestSignature

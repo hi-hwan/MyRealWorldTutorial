@@ -59,6 +59,7 @@ import com.realworld.android.petsave.common.data.api.ClientAuthenticator
 import com.realworld.android.petsave.common.data.api.ReportManager
 import com.realworld.android.petsave.common.domain.model.user.User
 import com.realworld.android.petsave.common.domain.repositories.UserRepository
+import com.realworld.android.petsave.common.utils.DataValidator.Companion.isValidEmailString
 import com.realworld.android.petsave.common.utils.Encryption.Companion.createLoginPassword
 import com.realworld.android.petsave.common.utils.Encryption.Companion.decryptPassword
 import com.realworld.android.petsave.common.utils.Encryption.Companion.generateSecretKey
@@ -229,18 +230,27 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun loginPressed(view: View) {
-        val biometricManager = BiometricManager.from(this)
-        when (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG)) {
-            BiometricManager.BIOMETRIC_SUCCESS -> displayLogin(view, false)
-            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> displayLogin(view, true)
-            BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE ->
-                toast("Biometric features are currently unavailable.")
+        var success = false
+        val email = binding.loginEmail.text.toString()
+        if (isSignedUp || isValidEmailString(email)) {
+            success = true
+        } else {
+            toast("Please enter a valid email.")
+        }
+        if (success) {
+            val biometricManager = BiometricManager.from(this)
+            when (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG)) {
+                BiometricManager.BIOMETRIC_SUCCESS -> displayLogin(view, false)
+                BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> displayLogin(view, true)
+                BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE ->
+                    toast("Biometric features are currently unavailable.")
 
-            BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED ->
-                toast("Please associate a biometric credential with your account.")
+                BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED ->
+                    toast("Please associate a biometric credential with your account.")
 
-            else ->
-                toast("An unknown error occurred. Please check your Biometric settings.")
+                else ->
+                    toast("An unknown error occurred. Please check your Biometric settings.")
+            }
         }
     }
 

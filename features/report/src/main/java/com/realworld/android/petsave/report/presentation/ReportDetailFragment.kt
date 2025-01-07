@@ -21,6 +21,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.realworld.android.petsave.common.data.api.ClientAuthenticator
 import com.realworld.android.petsave.common.data.api.ReportManager
+import com.realworld.android.petsave.common.utils.DataValidator.Companion.isValidJpegAtPath
 import com.realworld.android.petsave.common.utils.Encryption
 import com.realworld.android.petsave.common.utils.Encryption.Companion.encryptFile
 import com.realworld.android.petsave.report.databinding.FragmentReportDetailBinding
@@ -28,7 +29,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import java.io.FileOutputStream
 import java.io.ObjectOutputStream
-import java.io.RandomAccessFile
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
@@ -43,8 +43,8 @@ class ReportDetailFragment : Fragment() {
     lateinit var clientAuthenticator: ClientAuthenticator
 
     companion object {
-        private const val REPORT_APP_ID = 46341
-        private const val REPORT_PROVIDER_ID = 46341
+        private const val REPORT_APP_ID = 46341L
+        private const val REPORT_PROVIDER_ID = 46341L
         private const val REPORT_SESSION_KEY = "session_key_test"
     }
 
@@ -61,8 +61,19 @@ class ReportDetailFragment : Fragment() {
 
     private val selectImageFromGalleryResult =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            //image from gallery
             if (uri != null) {
-                getFileName(uri)
+                // Get the full size image
+                val filePathColumn = arrayOf(MediaStore.Images.Media.DATA)
+                val cursor = activity?.contentResolver?.query(uri, filePathColumn,
+                    null, null, null)
+                cursor?.moveToFirst()
+                val columnIndex = cursor?.getColumnIndex(filePathColumn[0])
+                val decodableImageString = columnIndex?.let {
+                    cursor.getString(it)
+                } ?: ""
+                cursor?.close()
+                showFileName(uri, decodableImageString)
             }
         }
 
@@ -115,7 +126,12 @@ class ReportDetailFragment : Fragment() {
             var reportString = binding.categoryEdtxtview.text.toString()
             reportString += " : "
             reportString += binding.detailsEdtxtview.text.toString()
-            //TODO: Sanitize string here
+            // Sanitize string (살균)
+            // 문자열에서 취약한 문자를 제거
+            // 예를 들어 [') OR 1=1 OR (password LIKE '* ] 처럼 SQL 언어를 사용하면 우회가 될 수 있다.
+            reportString = reportString.replace("\\", "")
+                .replace(";", "").replace("%", "")
+                .replace("\"", "").replace("\'", "")
 
             val reportID = UUID.randomUUID().toString()
 
@@ -225,9 +241,9 @@ class ReportDetailFragment : Fragment() {
 
     private fun selectImageFromGallery() = selectImageFromGalleryResult.launch("image/*")
 
-    private fun getFileName(selectedImage: Uri) {
+    private fun showFileName(selectedImage: Uri, decodableImageString: String?) {
         // Validate image
-        val isValid = isValidJPEGAtPath(selectedImage)
+        val isValid = isValidJpegAtPath(decodableImageString)
         if (isValid) {
             //get filename
             val fileNameColumn = arrayOf(MediaStore.Images.Media.DISPLAY_NAME)
@@ -237,45 +253,16 @@ class ReportDetailFragment : Fragment() {
             )
             nameCursor?.moveToFirst()
             val nameIndex = nameCursor?.getColumnIndex(fileNameColumn[0])
-            var filename = ""
-            nameIndex?.let {
-                filename = nameCursor.getString(it)
-            }
+            val fileName = nameIndex?.let {
+                nameCursor.getString(it)
+            } ?: ""
             nameCursor?.close()
 
             //update UI with filename
-            binding.uploadStatusTextview.text = filename
+            binding.uploadStatusTextview.text = fileName
         } else {
             val toast = Toast.makeText(context, "Please choose a JPEG image", Toast.LENGTH_LONG)
             toast.show()
         }
-    }
-
-    private fun isValidJPEGAtPath(selectedImage: Uri): Boolean {
-        var success = false
-        val file = File(context?.cacheDir, "temp.jpg")
-        val inputStream = activity?.contentResolver?.openInputStream(selectedImage)
-        val outputStream = activity?.contentResolver?.openOutputStream(Uri.fromFile(file))
-        outputStream?.let {
-            inputStream?.copyTo(it)
-
-            val randomAccessFile = RandomAccessFile(file, "r")
-            val length = randomAccessFile.length()
-            val lengthError = (length < 10L)
-            val start = ByteArray(2)
-            randomAccessFile.readFully(start)
-            randomAccessFile.seek(length - 2)
-            val end = ByteArray(2)
-            randomAccessFile.readFully(end)
-            success = !lengthError && start[0].toInt() == -1 && start[1].toInt() == -40 &&
-                    end[0].toInt() == -1 && end[1].toInt() == -39
-
-            randomAccessFile.close()
-            outputStream.close()
-        }
-        inputStream?.close()
-        file.delete()
-
-        return success
     }
 }

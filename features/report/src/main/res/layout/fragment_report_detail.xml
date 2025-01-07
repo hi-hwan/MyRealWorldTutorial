@@ -21,6 +21,7 @@
         android:layout_toEndOf="@+id/upload_photo_button"
         android:text="@string/send_report" />
 
+    <!-- maxLength로 데이터 양을 제한하여 특정 코드 스니펫이나 페이로드가 통과할 가능성을 줄일 수 있다. -->
     <EditText
         android:id="@+id/details_edtxtview"
         android:layout_width="match_parent"
@@ -52,6 +53,7 @@
         android:inputType="textNoSuggestions|textVisiblePassword|textFilter"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
+        android:maxLength="32"
         android:textSize="18sp" />
 
     <TextView

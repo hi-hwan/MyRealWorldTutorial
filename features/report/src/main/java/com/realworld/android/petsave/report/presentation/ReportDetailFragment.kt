@@ -143,7 +143,9 @@ class ReportDetailFragment : Fragment() {
                 }
             }
             // testCustomEncryption(reportString)
-            ReportTracker.reportNumber.incrementAndGet()
+            synchronized(this) {
+                ReportTracker.reportNumber.incrementAndGet()
+            }
 
             //2. Send report
             //Add Signature
@@ -186,7 +188,9 @@ class ReportDetailFragment : Fragment() {
         isSendingReport = false
         if (success) {
             context?.let {
-                val report = "Report: ${ReportTracker.reportNumber.get()}"
+                val report = synchronized(this) {
+                    "Report: ${ReportTracker.reportNumber.get()}"
+                }
                 val toast = Toast.makeText(
                     it, "Thank you for your report.$report", Toast
                         .LENGTH_LONG

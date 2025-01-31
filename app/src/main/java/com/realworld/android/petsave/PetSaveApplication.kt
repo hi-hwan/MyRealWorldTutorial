@@ -36,6 +36,7 @@ package com.realworld.android.petsave
 
 import com.google.android.play.core.splitcompat.SplitCompatApplication
 import com.realworld.android.logging.Logger
+import com.realworld.android.remoteconfig.RemoteConfigUtil
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
@@ -47,6 +48,8 @@ class PetSaveApplication : SplitCompatApplication() {
         super.onCreate()
 
         initLogger()
+
+        RemoteConfigUtil.init(BuildConfig.DEBUG)
     }
 
     private fun initLogger() {

@@ -5,7 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.realworld.android.petsave.common.utils.setImage
 import com.realworld.android.petsave.easteregg.databinding.FragmentSecretBinding
+import com.realworld.android.remoteconfig.RemoteConfigUtil
 
 class SecretFragment : Fragment() {
     private val binding get() = _binding!!
@@ -17,7 +19,7 @@ class SecretFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSecretBinding.inflate(inflater, container, false)
-
+        _binding?.secretImage?.setImage(RemoteConfigUtil.getSecretImageUrl())
         return binding.root
     }
 }

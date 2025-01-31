@@ -22,5 +22,6 @@ include ':features:onboarding'
 include ':features:easteregg'
 include ':features:report'
 include ':common'
+include ':remoteconfig'
 
 rootProject.name = 'PetSave'

@@ -6,6 +6,7 @@ android {
 
 dependencies {
     implementation project(":common")
+    implementation project(":remoteconfig")
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
